@@ -8,6 +8,7 @@ export default auth.middleware({
 export const config = {
   matcher: [
     '/akun/:path*',
+    '/profil/:path*',
     '/riwayat/:path*',
     '/e-tiket/:path*',
   ],
