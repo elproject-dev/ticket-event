@@ -8,11 +8,19 @@ export function SplashScreen() {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
+    // Check if splash has been shown in this session
+    const hasShownSplash = sessionStorage.getItem("splash_shown");
+    if (hasShownSplash) {
+      setMounted(false);
+      return;
+    }
+
     const timer1 = setTimeout(() => {
       setFadeOut(true);
     }, 2000); // Start fading out after 2s
 
     const timer2 = setTimeout(() => {
+      sessionStorage.setItem("splash_shown", "true");
       setMounted(false);
     }, 2500); // Unmount after 2.5s
 

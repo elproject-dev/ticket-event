@@ -2,31 +2,42 @@
 
 import { useTransition, useState, useRef } from "react";
 import Link from "next/link";
-import { ArrowLeft, Save, Loader2, ImagePlus } from "lucide-react";
+import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { buatBanner } from "./actions";
+import PhotoGalleryDnD, { PhotoItem } from "@/components/PhotoGalleryDnD";
 
 export default function AdminTambahBannerPage() {
   const [isPending, startTransition] = useTransition();
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<PhotoItem[]>(Array.from({ length: 6 }).map((_, i) => ({
+    id: `photo-${i}`,
+    file: null,
+    previewUrl: null,
+    isExisting: false,
+  })));
   const [isActive, setIsActive] = useState(true);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPreviewUrl(URL.createObjectURL(file));
-    } else {
-      setPreviewUrl(null);
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    
+    formData.delete("gambar");
+    formData.delete("subGambar1");
+    formData.delete("subGambar2");
+    formData.delete("subGambar3");
+    formData.delete("subGambar4");
+    formData.delete("subGambar5");
+
+    if (photos[0]?.file) formData.append("gambar", photos[0].file);
+    if (photos[1]?.file) formData.append("subGambar1", photos[1].file);
+    if (photos[2]?.file) formData.append("subGambar2", photos[2].file);
+    if (photos[3]?.file) formData.append("subGambar3", photos[3].file);
+    if (photos[4]?.file) formData.append("subGambar4", photos[4].file);
+    if (photos[5]?.file) formData.append("subGambar5", photos[5].file);
+
     startTransition(() => {
       buatBanner(formData);
     });
@@ -45,37 +56,11 @@ export default function AdminTambahBannerPage() {
       <div className="p-4 space-y-6">
         <form onSubmit={handleSubmit} className="space-y-4 pb-10">
 
-          {/* Upload Gambar Utama (Rasio 2:1) */}
+          {/* Upload Galeri Banner (Utama & Tambahan) */}
           <div className="space-y-2">
-            <Label className="text-xs font-semibold">Foto Banner</Label>
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full aspect-[2/1] border-2 border-dashed border-muted-foreground/25 bg-muted/30 cursor-pointer flex flex-col items-center justify-center relative overflow-hidden transition-colors hover:bg-muted/50 rounded-none"
-            >
-              {previewUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="w-full h-full object-cover absolute inset-0"
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center text-muted-foreground">
-                  <ImagePlus className="w-8 h-8 mb-2 opacity-50" />
-                  <span className="text-xs font-medium">Klik untuk upload foto</span>
-                  <span className="text-[10px] opacity-70">Rasio ideal 2:1</span>
-                </div>
-              )}
-            </div>
-            <input
-              type="file"
-              name="gambar"
-              accept="image/*"
-              className="hidden"
-              ref={fileInputRef}
-              onChange={handleImageChange}
-              required
-            />
+            <Label className="text-xs font-semibold">Galeri Foto Banner (Utama & Tambahan)</Label>
+            <p className="text-[10px] text-muted-foreground">Rasio ideal 2:1. Geser untuk mengatur urutan.</p>
+            <PhotoGalleryDnD initialPhotos={photos} onChange={setPhotos} />
           </div>
 
           <div className="space-y-2">

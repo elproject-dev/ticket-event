@@ -39,8 +39,10 @@ export const viewport = {
 
 import Script from "next/script";
 
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+
 import { BottomNavigation } from "@/components/bottom-navigation";
-import { SplashScreen } from "@/components/splash-screen";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -48,9 +50,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", outfit.variable)}
     >
-      <body className="min-h-full flex flex-col pb-16">
-        <SplashScreen />
-        {children}
+      <body className="min-h-full flex flex-col">
+        <SidebarProvider
+          style={
+            {
+              "--sidebar-width": "calc(var(--spacing) * 72)",
+              "--header-height": "calc(var(--spacing) * 12)",
+            } as React.CSSProperties
+          }
+        >
+          <AppSidebar />
+          <SidebarInset>
+            <div className="flex flex-1 flex-col pb-16 md:pb-0">
+              {children}
+            </div>
+          </SidebarInset>
+        </SidebarProvider>
         <BottomNavigation />
         <Script 
           src="https://app.sandbox.midtrans.com/snap/snap.js"

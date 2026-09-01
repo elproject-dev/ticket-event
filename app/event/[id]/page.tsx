@@ -40,27 +40,19 @@ export default async function DetailEvent({ params }: { params: Promise<{ id: st
         </nav>
       </header>
 
-      <main className="flex-1 pb-48">
-        {/* Event Banner */}
-        <div 
-          className="w-full h-[25vh] bg-cover bg-center relative border-b"
-          style={{ backgroundImage: `url('${event.url_gambar || '/tech-banner.jpg'}')` }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
-          <Link href="/" className="absolute top-4 left-4 z-10 p-2 text-white bg-none hover:bg-white/10  rounded-none">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-        </div>
-
-        <div className="container mx-auto px-4 -mt-8 relative z-10">
+      <main className="flex-1 pb-8 mt-4">
+        <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 gap-6">
             <div className="space-y-6">
               <div>
                 <h1 className="text-xl font-bold mb-4 leading-tight tracking-wide">{event.judul}</h1>
                 <SubPhotoGallery 
+                  mainImg={event.url_gambar}
                   img1={event.url_sub_gambar_1} 
                   img2={event.url_sub_gambar_2} 
                   img3={event.url_sub_gambar_3} 
+                  img4={event.url_sub_gambar_4} 
+                  img5={event.url_sub_gambar_5} 
                 />
               </div>
 

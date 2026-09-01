@@ -44,18 +44,19 @@ export function TicketDetailsModal({ tiket }: TicketDetailsModalProps) {
       </button>
 
       {isOpen && (
-        <div className="fixed top-0 left-0 right-0 bottom-[60px] z-40 flex flex-col bg-background overflow-y-auto">
-          {/* Header */}
-          <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-4 bg-background border-b">
-            <h2 className="text-sm font-bold tracking-widest">Rincian Pemesanan</h2>
-            <button onClick={() => setIsOpen(false)} className="text-[10px] font-bold tracking-widest text-muted-foreground hover:text-foreground">
-              TUTUP
-            </button>
-          </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-lg bg-background flex flex-col max-h-[90vh] shadow-xl border border-border rounded-none">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-4 bg-background border-b">
+              <h2 className="text-sm font-bold tracking-widest">Rincian Pemesanan</h2>
+              <button onClick={() => setIsOpen(false)} className="text-[10px] font-bold tracking-widest text-muted-foreground hover:text-foreground">
+                TUTUP
+              </button>
+            </div>
 
-          {/* Konten Utama */}
-          <div className="flex-1 p-4 pb-24">
-            <div className="max-w-md mx-auto space-y-6">
+            {/* Konten Utama */}
+            <div className="flex-1 p-4 pb-8 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="mx-auto space-y-6">
 
               {/* Status Header */}
               <div
@@ -140,8 +141,8 @@ export function TicketDetailsModal({ tiket }: TicketDetailsModalProps) {
               </div>
 
             </div>
+            </div>
           </div>
-
         </div>
       )}
     </>

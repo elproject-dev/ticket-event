@@ -66,7 +66,7 @@ export default function CheckoutBar({ event }: { event: any }) {
   };
 
   return (
-    <div className="fixed bottom-[60px] left-0 right-0 border-t bg-background p-4 z-40 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+    <div className="sticky bottom-0 border-t bg-background p-4 z-40 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
       <div className="container mx-auto">
         <div className="flex justify-between items-center mb-2">
           <span className="text-[10px] tracking-widest text-muted-foreground">Harga Tiket</span>

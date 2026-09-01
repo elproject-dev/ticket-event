@@ -56,7 +56,7 @@ export default function EventCardClient({ event }: { event: event }) {
         className="rounded-none border shadow-sm flex flex-col p-0 gap-0 overflow-hidden cursor-pointer active:scale-[0.99] transition-transform"
         onClick={() => setIsOpen(true)}
       >
-        <div className="w-full aspect-[2/1] bg-muted relative shrink-0">
+        <div className="w-full aspect-video bg-muted relative shrink-0">
           {event.url_gambar ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={event.url_gambar} alt={event.judul} className="object-cover w-full h-full absolute inset-0" />
@@ -111,16 +111,22 @@ export default function EventCardClient({ event }: { event: event }) {
           <div className="space-y-5">
             {event.url_gambar && (
               <div className="space-y-2">
-                <div className="w-full aspect-[2/1] bg-muted relative shrink-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={event.url_gambar} alt={event.judul} className="object-cover w-full h-full absolute inset-0" />
-                </div>
+                <span className="font-semibold text-[10px] uppercase tracking-wider text-muted-foreground block">Galeri Foto</span>
                 <div className="grid grid-cols-3 gap-2">
-                  {[event.url_sub_gambar_1, event.url_sub_gambar_2, event.url_sub_gambar_3].map((subGambar, idx) => (
-                    <div key={idx} className="w-full aspect-[2/1] bg-muted/50 relative shrink-0 overflow-hidden">
-                      {subGambar ? (
+                  {[
+                    event.url_gambar, 
+                    event.url_sub_gambar_1, 
+                    event.url_sub_gambar_2, 
+                    event.url_sub_gambar_3, 
+                    // @ts-ignore
+                    event.url_sub_gambar_4, 
+                    // @ts-ignore
+                    event.url_sub_gambar_5
+                  ].map((gambar, idx) => (
+                    <div key={idx} className="w-full aspect-video bg-muted/50 relative shrink-0 overflow-hidden">
+                      {gambar ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
-                        <img src={subGambar} alt={`Sub Foto ${idx + 1}`} className="object-cover w-full h-full absolute inset-0" />
+                        <img src={gambar as string} alt={`Foto ${idx + 1}`} className="object-cover w-full h-full absolute inset-0" />
                       ) : (
                         <div className="flex items-center justify-center w-full h-full text-[8px] text-muted-foreground/50 border border-dashed border-muted-foreground/20">
                           -

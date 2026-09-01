@@ -11,5 +11,11 @@ export default async function EditAcaraPage({ params }: { params: Promise<{ id: 
 
   if (!acara) return notFound();
 
-  return <EditAcaraClient acara={acara} />;
+  const plainAcara = {
+    ...acara,
+    harga: Number(acara.harga),
+    diskon: acara.diskon ? Number(acara.diskon) : null,
+  } as any;
+
+  return <EditAcaraClient acara={plainAcara} />;
 }

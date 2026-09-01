@@ -1,26 +1,15 @@
 "use client";
 
-import { createClient } from "@/utils/supabase/client";
+import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 
 export default function MasukPage() {
-  const supabase = createClient();
-  const router = useRouter();
-
   const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    await authClient.signIn.social({
       provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/api/auth/callback`,
-      },
+      callbackURL: "/",
     });
-
-    if (error) {
-      alert("Gagal masuk dengan Google: " + error.message);
-    }
   };
 
   return (

@@ -4,6 +4,7 @@ import { User, Ticket, History, Bell, Clapperboard } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 import { HeroCarousel } from "@/components/hero-carousel";
+import { SplashScreen } from "@/components/splash-screen";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,7 @@ export default async function Beranda() {
   const mendatang = eventList?.slice(3, 6) || [];
   return (
     <div className="flex flex-col min-h-screen text-xs">
+      <SplashScreen />
       {/* Consistent Header */}
       <header className="px-4 py-3 flex items-center justify-between border-b bg-background sticky top-0 z-50">
         <div>
@@ -39,7 +41,7 @@ export default async function Beranda() {
           <Link href="/masuk" className="text-xs font-medium  tracking-wider text-muted-foreground hover:text-primary">
             Masuk
           </Link>
-          <Link href="/daftar" className="text-xs font-medium  tracking-wider text-primary">
+          <Link href="/masuk" className="text-xs font-medium  tracking-wider text-primary">
             Daftar
           </Link>
         </nav>
@@ -83,12 +85,12 @@ export default async function Beranda() {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {acaraSaatIni.map((acara) => (
                   <Link href={`/acara/${acara.id}`} key={acara.id}>
                     <div className="border border-primary/20 bg-primary/5 transition-colors hover:bg-primary/10">
                       <div
-                        className="aspect-[2/1] bg-cover bg-center relative border-b border-primary/20"
+                        className="aspect-video bg-cover bg-center relative border-b border-primary/20"
                         style={{ backgroundImage: `url('${acara.url_gambar || '/tech-banner.jpg'}')` }}
                       >
                         <div className="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-none uppercase tracking-widest animate-pulse">
@@ -126,12 +128,12 @@ export default async function Beranda() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {unggulan.length > 0 ? unggulan.map((event) => (
                 <Link href={`/event/${event.id}`} key={event.id}>
                   <div className="border bg-background transition-colors hover:bg-muted/10">
                     <div
-                      className="aspect-[2/1] bg-cover bg-center relative border-b"
+                      className="aspect-video bg-cover bg-center relative border-b"
                       style={{ backgroundImage: `url('${event.url_gambar || '/tech-banner.jpg'}')` }}
                     >
                       {/* Premium Image Placeholder */}
@@ -168,12 +170,12 @@ export default async function Beranda() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {mendatang.length > 0 ? mendatang.map((event) => (
                 <Link href={`/event/${event.id}`} key={event.id}>
                   <div className="border bg-background transition-colors hover:bg-muted/10">
                     <div
-                      className="aspect-[2/1] bg-cover bg-center relative border-b"
+                      className="aspect-video bg-cover bg-center relative border-b"
                       style={{ backgroundImage: `url('${event.url_gambar || '/tech-banner.jpg'}')` }}
                     >
                       <div className="absolute bottom-3 left-3 text-white">
@@ -200,16 +202,7 @@ export default async function Beranda() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t py-6 mt-auto bg-muted/10">
-        <div className="container mx-auto px-4 flex flex-col gap-2 text-[10px] text-muted-foreground  tracking-widest">
-          <div className="flex justify-between">
-            <Link href="#" className="hover:text-foreground">Bantuan</Link>
-            <Link href="#" className="hover:text-foreground">Privasi</Link>
-          </div>
-          <div className="pt-2 border-t text-center">© 2026 MANAJEMENTIKET</div>
-        </div>
-      </footer>
+
     </div>
   );
 }

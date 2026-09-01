@@ -13,7 +13,7 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { buatAcara } from "@/app/admin/acara/tambah/actions";
-import Image from "next/image";
+import PhotoGalleryDnD, { PhotoItem } from "@/components/PhotoGalleryDnD";
 
 function formatTanggal(date: Date) {
   return format(date, "dd MMM yyyy", { locale: id }).replace("Agt", "Agu");
@@ -83,8 +83,12 @@ function TimePicker({ value, onChange, placeholder = "Atur Waktu" }: { value: st
 
 export default function AdminTambahAcaraPage() {
   const [isPending, startTransition] = useTransition();
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [subPreviews, setSubPreviews] = useState<(string | null)[]>([null, null, null]);
+  const [photos, setPhotos] = useState<PhotoItem[]>(Array.from({ length: 6 }).map((_, i) => ({
+    id: `photo-${i}`,
+    file: null,
+    previewUrl: null,
+    isExisting: false,
+  })));
   const [dateMulai, setDateMulai] = useState<Date>();
   const [dateSelesai, setDateSelesai] = useState<Date>();
   const [timeMulai, setTimeMulai] = useState<string>("");
@@ -102,36 +106,24 @@ export default function AdminTambahAcaraPage() {
     return rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const subInputRefs = [
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-  ];
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPreviewUrl(URL.createObjectURL(file));
-    } else {
-      setPreviewUrl(null);
-    }
-  };
-
-  const handleSubImageChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    const newPreviews = [...subPreviews];
-    if (file) {
-      newPreviews[index] = URL.createObjectURL(file);
-    } else {
-      newPreviews[index] = null;
-    }
-    setSubPreviews(newPreviews);
-  };
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    
+    formData.delete("gambar");
+    formData.delete("subGambar1");
+    formData.delete("subGambar2");
+    formData.delete("subGambar3");
+    formData.delete("subGambar4");
+    formData.delete("subGambar5");
+
+    if (photos[0]?.file) formData.append("gambar", photos[0].file);
+    if (photos[1]?.file) formData.append("subGambar1", photos[1].file);
+    if (photos[2]?.file) formData.append("subGambar2", photos[2].file);
+    if (photos[3]?.file) formData.append("subGambar3", photos[3].file);
+    if (photos[4]?.file) formData.append("subGambar4", photos[4].file);
+    if (photos[5]?.file) formData.append("subGambar5", photos[5].file);
+
     startTransition(() => {
       buatAcara(formData);
     });
@@ -150,71 +142,9 @@ export default function AdminTambahAcaraPage() {
       <div className="p-4 space-y-6">
         <form onSubmit={handleSubmit} className="space-y-4 pb-10">
 
-          {/* Upload Gambar dengan rasio 2:1 */}
           <div className="space-y-2">
-            <Label className="text-xs font-semibold">Foto Event</Label>
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full aspect-[2/1] border-2 border-dashed border-muted-foreground/25 bg-muted/30 cursor-pointer flex flex-col items-center justify-center relative overflow-hidden transition-colors hover:bg-muted/50 rounded-none"
-            >
-              {previewUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="w-full h-full object-cover absolute inset-0"
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center text-muted-foreground">
-                  <ImagePlus className="w-8 h-8 mb-2 opacity-50" />
-                  <span className="text-xs font-medium">Klik untuk upload foto</span>
-                  <span className="text-[10px] opacity-70">Rasio ideal 2:1</span>
-                </div>
-              )}
-            </div>
-            <input
-              type="file"
-              id="gambar"
-              name="gambar"
-              accept="image/*"
-              className="hidden"
-              ref={fileInputRef}
-              onChange={handleImageChange}
-            />
-          </div>
-
-          {/* 3 Kolom Sub Foto */}
-          <div className="grid grid-cols-3 gap-3">
-            {[0, 1, 2].map((index) => (
-              <div key={index} className="space-y-1">
-                <div
-                  onClick={() => subInputRefs[index].current?.click()}
-                  className="w-full aspect-[2/1] border-2 border-dashed border-muted-foreground/25 bg-muted/30 cursor-pointer flex flex-col items-center justify-center relative overflow-hidden transition-colors hover:bg-muted/50 rounded-none"
-                >
-                  {subPreviews[index] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={subPreviews[index] as string}
-                      alt={`Sub Preview ${index + 1}`}
-                      className="w-full h-full object-cover absolute inset-0"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-muted-foreground">
-                      <ImagePlus className="w-4 h-4 mb-1 opacity-50" />
-                      <span className="text-[8px] font-medium text-center px-1">Sub Foto {index + 1}</span>
-                    </div>
-                  )}
-                </div>
-                <input
-                  type="file"
-                  name={`subGambar${index + 1}`}
-                  accept="image/*"
-                  className="hidden"
-                  ref={subInputRefs[index]}
-                  onChange={(e) => handleSubImageChange(index, e)}
-                />
-              </div>
-            ))}
+            <Label className="text-xs font-semibold">Galeri Foto Acara (Utama & Tambahan)</Label>
+            <PhotoGalleryDnD initialPhotos={photos} onChange={setPhotos} />
           </div>
 
           <div className="space-y-2">
@@ -233,7 +163,7 @@ export default function AdminTambahAcaraPage() {
             <Input
               id="nama_penyelenggara"
               name="nama_penyelenggara"
-              placeholder="Contoh: MANAJEMENTIKET"
+              placeholder="Masukkan Nama Penyelenggara"
               required
               className="rounded-none text-sm"
             />

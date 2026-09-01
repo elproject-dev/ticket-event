@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ['192.168.1.9', 'elproject.loca.lt', 'ticket-elproject.loca.lt', 'localhost', '127.0.0.1'],
   experimental: {
     serverActions: {
-      bodySizeLimit: "5mb",
+      bodySizeLimit: "20mb",
     },
   },
   turbopack: {},

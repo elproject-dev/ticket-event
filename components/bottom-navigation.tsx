@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Compass, QrCode, History, User, Menu, LayoutDashboard, CalendarDays, Images } from "lucide-react";
+import { Home, Compass, QrCode, History, User, Menu, LayoutDashboard, CalendarDays, Images, CompassIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function BottomNavigation() {
@@ -14,16 +14,15 @@ export function BottomNavigation() {
     { name: "Beranda", href: "/", icon: Home },
     { name: "Acara", href: "/acara", icon: Compass },
     { name: "QR", href: "/e-tiket", icon: QrCode, isFloating: true },
-    { name: "Riwayat", href: "/riwayat", icon: History },
+    { name: "Event", href: "/event", icon: Compass },
   ];
 
   const moreLinks = [
     { name: "Akun", href: "/akun", icon: User },
-    { name: "Dasbor Admin", href: "/admin", icon: LayoutDashboard },
-    { name: "Daftar Event", href: "/event", icon: Compass },
-    { name: "Kelola Acara", href: "/admin/acara", icon: CalendarDays },
-    { name: "Kelola Event", href: "/admin/event", icon: CalendarDays },
-    { name: "Kelola Banner", href: "/admin/banner", icon: Images },
+    { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+    { name: "Acara", href: "/admin/acara", icon: CalendarDays },
+    { name: "Events", href: "/admin/event", icon: CompassIcon },
+    { name: "Banner", href: "/admin/banner", icon: Images },
   ];
 
   return (
@@ -35,7 +34,7 @@ export function BottomNavigation() {
         />
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 rounded-none">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 rounded-none md:hidden">
 
         {/* Main bottom bar */}
         <div className="container mx-auto px-1 max-w-md relative z-20 bg-background border-t shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.15)] rounded-t-2xl">

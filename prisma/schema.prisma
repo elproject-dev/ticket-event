@@ -36,6 +36,8 @@ model acara {
   url_sub_gambar_1   String?
   url_sub_gambar_2   String?
   url_sub_gambar_3   String?
+  url_sub_gambar_4   String?
+  url_sub_gambar_5   String?
   waktu              String?
   kategori           String?  @default("REGULER")
   tiket              tiket[]
@@ -56,6 +58,8 @@ model event {
   url_sub_gambar_1   String?
   url_sub_gambar_2   String?
   url_sub_gambar_3   String?
+  url_sub_gambar_4   String?
+  url_sub_gambar_5   String?
   dibuat_pada        DateTime @default(now()) @db.Timestamptz
   diubah_pada        DateTime @updatedAt @db.Timestamptz
   nama_penyelenggara String   @default("MANAJEMENTIKET")
@@ -65,9 +69,14 @@ model event {
 
 model banner {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  judul       String
-  url_gambar  String
-  tautan      String?
+  judul            String
+  url_gambar       String?
+  url_sub_gambar_1 String?
+  url_sub_gambar_2 String?
+  url_sub_gambar_3 String?
+  url_sub_gambar_4 String?
+  url_sub_gambar_5 String?
+  tautan           String?
   is_active   Boolean  @default(true)
   dibuat_pada DateTime @default(now()) @db.Timestamptz
   diubah_pada DateTime @updatedAt @db.Timestamptz

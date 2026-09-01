@@ -22,6 +22,8 @@ export async function buatAcara(formData: FormData) {
   const subGambar1 = formData.get("subGambar1") as File | null;
   const subGambar2 = formData.get("subGambar2") as File | null;
   const subGambar3 = formData.get("subGambar3") as File | null;
+  const subGambar4 = formData.get("subGambar4") as File | null;
+  const subGambar5 = formData.get("subGambar5") as File | null;
   
   if (!judul || !nama_penyelenggara || !deskripsi || !tanggal_mulai || !tanggal_selesai || !lokasi || isNaN(harga) || isNaN(kapasitas)) {
     throw new Error("Data tidak lengkap");
@@ -32,6 +34,8 @@ export async function buatAcara(formData: FormData) {
   const url_sub_gambar_1 = await uploadImageToNeon(subGambar1, "acara");
   const url_sub_gambar_2 = await uploadImageToNeon(subGambar2, "acara");
   const url_sub_gambar_3 = await uploadImageToNeon(subGambar3, "acara");
+  const url_sub_gambar_4 = await uploadImageToNeon(subGambar4, "acara");
+  const url_sub_gambar_5 = await uploadImageToNeon(subGambar5, "acara");
 
   try {
     await prisma.acara.create({
@@ -50,6 +54,8 @@ export async function buatAcara(formData: FormData) {
         url_sub_gambar_1,
         url_sub_gambar_2,
         url_sub_gambar_3,
+        url_sub_gambar_4,
+        url_sub_gambar_5,
         diubah_pada: new Date(),
       }
     });

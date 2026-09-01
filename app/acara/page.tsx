@@ -27,18 +27,18 @@ export default async function AcaraPage() {
       </header>
 
       <main className="flex-1 p-4 pb-24">
-        <div className="container mx-auto max-w-md">
+        <div className="container mx-auto">
           {!acaraList || acaraList.length === 0 ? (
             <div className="text-center py-10 text-muted-foreground border border-dashed rounded-none bg-background">
               Belum ada acara saat ini.
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {acaraList.map((acara) => (
                 <Link href={`/acara/${acara.id}`} key={acara.id}>
                   <div className="border border-primary/20 bg-primary/5 transition-colors hover:bg-primary/10 shadow-sm">
                     <div
-                      className="aspect-[2/1] bg-cover bg-center relative border-b border-primary/20"
+                      className="aspect-video bg-cover bg-center relative border-b border-primary/20"
                       style={{ backgroundImage: `url('${acara.url_gambar || '/tech-banner.jpg'}')` }}
                     >
                       <div className="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-none uppercase tracking-widest animate-pulse">

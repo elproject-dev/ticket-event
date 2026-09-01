@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server";
+import { auth } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight, LogOut, Bell, HelpCircle, User, Ticket } from "lucide-react";
@@ -6,19 +6,19 @@ import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
-export default async function AkunPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export default async function Page() {
+  const { data: session } = await auth.getSession();
 
-  if (!user) {
+  if (!session?.user) {
     redirect("/masuk");
   }
+
+  const user = session.user;
 
   // Handle logout action
   const handleLogout = async () => {
     "use server";
-    const supabase = await createClient();
-    await supabase.auth.signOut();
+    await auth.signOut();
     redirect("/masuk");
   };
 
@@ -45,7 +45,7 @@ export default async function AkunPage() {
             <User className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h2 className="font-bold text-sm">{user.user_metadata?.full_name || user.email}</h2>
+            <h2 className="font-bold text-sm">{user.name || user.email}</h2>
             <p className="text-xs text-muted-foreground">{user.email}</p>
           </div>
         </div>

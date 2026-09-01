@@ -45,13 +45,7 @@ export default async function Tiketku() {
       </header>
 
       <main className="flex-1 pb-24">
-        {/* Page Title */}
-        <div className="container mx-auto px-4 py-4 border-b bg-muted/5">
-          <h1 className="text-xl font-bold tracking-tight leading-snug">Riwayat</h1>
-          <p className="text-xs text-muted-foreground mt-2 max-w-[400px]">
-            Daftar riwayat pemesanan tiket Anda.
-          </p>
-        </div>
+
 
         <div className="container mx-auto px-4 py-6">
           {tiketList.length === 0 ? (
@@ -63,7 +57,7 @@ export default async function Tiketku() {
               {tiketList.map((tiket) => {
                 const isPaid = tiket.status === "VALID" || tiket.status === "TERPAKAI";
                 const isPending = tiket.status === "PENDING";
-                
+
                 // Ambil data acara atau event (mana yang ada)
                 const item = tiket.acara || tiket.event;
 
@@ -127,16 +121,7 @@ export default async function Tiketku() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t py-6 mt-auto bg-muted/10">
-        <div className="container mx-auto px-4 flex flex-col gap-2 text-[10px] text-muted-foreground  tracking-widest">
-          <div className="flex justify-between">
-            <Link href="#" className="hover:text-foreground">Bantuan</Link>
-            <Link href="#" className="hover:text-foreground">Privasi</Link>
-          </div>
-          <div className="pt-2 border-t text-center">© 2026 MANAJEMENTIKET</div>
-        </div>
-      </footer>
+
     </div>
   );
 }
