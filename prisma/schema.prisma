@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model pengguna {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email       String   @unique
+  nama        String?
+  peran       String   @default("pengguna")
+  dibuat_pada DateTime @default(now()) @db.Timestamptz
+  diubah_pada DateTime @updatedAt @db.Timestamptz
+  tiket       tiket[]
+}
+
+model acara {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dibuat_pada        DateTime @default(now()) @db.Timestamptz
+  diubah_pada        DateTime @updatedAt @db.Timestamptz
+  judul              String
+  nama_penyelenggara String?
+  deskripsi          String?
+  tanggal_mulai      DateTime @db.Timestamptz
+  tanggal_selesai    DateTime @db.Timestamptz
+  lokasi             String
+  url_maps           String?
+  harga              Decimal  @default(0)
+  diskon             Decimal?
+  kapasitas          Int      @default(0)
+  url_gambar         String?
+  url_sub_gambar_1   String?
+  url_sub_gambar_2   String?
+  url_sub_gambar_3   String?
+  waktu              String?
+  kategori           String?  @default("REGULER")
+  tiket              tiket[]
+}
+
+model event {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  judul              String
+  deskripsi          String
+  tanggal_mulai      DateTime @db.Timestamptz
+  tanggal_selesai    DateTime @db.Timestamptz
+  lokasi             String
+  url_maps           String?
+  harga              Float
+  diskon             Float?
+  kapasitas          Int
+  url_gambar         String?
+  url_sub_gambar_1   String?
+  url_sub_gambar_2   String?
+  url_sub_gambar_3   String?
+  dibuat_pada        DateTime @default(now()) @db.Timestamptz
+  diubah_pada        DateTime @updatedAt @db.Timestamptz
+  nama_penyelenggara String   @default("MANAJEMENTIKET")
+  kategori           String?  @default("REGULER")
+  tiket              tiket[]
+}
+
+model banner {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  judul       String
+  url_gambar  String
+  tautan      String?
+  is_active   Boolean  @default(true)
+  dibuat_pada DateTime @default(now()) @db.Timestamptz
+  diubah_pada DateTime @updatedAt @db.Timestamptz
+  deskripsi   String?
+}
+
+model tiket {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_acara          String?  @db.Uuid
+  id_event          String?  @db.Uuid
+  id_pengguna       String   @db.Uuid
+  qr_code           String   @unique
+  id_pembayaran     String?  @unique
+  metode_pembayaran String?
+  status_bayar      String?
+  snap_token        String?
+  status            String   @default("pending")
+  dibuat_pada       DateTime @default(now()) @db.Timestamptz
+  diubah_pada       DateTime @updatedAt @db.Timestamptz
+
+  acara    acara?   @relation(fields: [id_acara], references: [id], onDelete: Cascade)
+  event    event?   @relation(fields: [id_event], references: [id], onDelete: Cascade)
+  pengguna pengguna @relation(fields: [id_pengguna], references: [id], onDelete: Cascade)
+}

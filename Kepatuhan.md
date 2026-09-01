@@ -1,0 +1,13 @@
+- gunakan bahasa indonesia - termasuk nama dalam database dan nama file tsx
+- mohon untuk tidak menggunakan konsep uppercase jika tidak di perintahkan
+- buatkan tanpa konsep rounded
+- jangan buatkan konsep dengan icon tanpa di minta
+- buatkan deskripsi singkat jika di perlukan
+- gunakan pnpm bukan npm
+- periksa error terminal jika ada error problem - perbaiki
+- selalu buatkan konsep setiap halaman konsisten terutama pada header
+- buat konsisten jika memerlukan sebuah tabel agar sama setiap halama
+- fokus hanya untuk tampilan mobile saja
+- gunakan font kecil konsisten
+- selalu buatkan konsep premium setiap halaman
+- gunakan juga format ribuan titik otomatis ketika membuat fungsi input angka
