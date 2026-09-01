@@ -31,12 +31,9 @@ import {
   ImageSquare
 } from "@phosphor-icons/react"
 
+import { authClient } from "@/lib/auth/client"
+
 const data = {
-  user: {
-    name: "Admin Event",
-    email: "admin@eventticket.com",
-    avatar: "/avatars/admin.jpg",
-  },
   navMain: [
     {
       title: "Beranda",
@@ -114,7 +111,20 @@ const data = {
     },
   ],
 }
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: session } = authClient.useSession();
+  
+  const userData = session?.user ? {
+    name: session.user.name || "Pengguna",
+    email: session.user.email || "",
+    avatar: session.user.image || "",
+  } : {
+    name: "Tamu",
+    email: "Belum login",
+    avatar: "",
+  };
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -135,7 +145,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain label="Administrator" items={data.navAdmin} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
   )
