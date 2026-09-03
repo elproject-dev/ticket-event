@@ -112,7 +112,7 @@ const data = {
       icon: <QrCode />,
     },
     {
-      title: "Riwayat Validasi",
+      title: "Riwayat",
       url: "/staf/riwayat-scan",
       icon: <ClockCounterClockwise />,
     },

@@ -1,29 +1,63 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Compass, QrCode, History, User, Menu, LayoutDashboard, CalendarDays, Images, CompassIcon } from "lucide-react";
+import { Home, Compass, QrCode, History, User, Menu, LayoutDashboard, CalendarDays, Images, CompassIcon, ScanLine, Users, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { authClient } from "@/lib/auth/client";
 
 export function BottomNavigation() {
   const pathname = usePathname();
   const [showMore, setShowMore] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
-  const mainLinks = [
+  const { data: session } = authClient.useSession();
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetch("/api/user/role")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.peran) setUserRole(data.peran);
+        })
+        .catch(() => {});
+    } else {
+      setUserRole(null);
+    }
+  }, [session?.user?.email]);
+
+  const isStaffOrAdmin =
+    userRole === "staf" ||
+    userRole === "admin" ||
+    pathname.startsWith("/staf") ||
+    pathname.startsWith("/admin");
+
+  const mainLinks = isStaffOrAdmin ? [
+    { name: "Beranda", href: "/", icon: Home },
+    { name: "Riwayat", href: "/staf/riwayat-scan", icon: History },
+    { name: "Scan", href: "/staf/scan", icon: ScanLine, isFloating: true },
+    { name: "Akun", href: "/akun", icon: User },
+  ] : [
     { name: "Beranda", href: "/", icon: Home },
     { name: "Acara", href: "/acara", icon: Compass },
-    { name: "QR", href: "/e-tiket", icon: QrCode, isFloating: true },
+    { name: "QR Tiket", href: "/e-tiket", icon: QrCode, isFloating: true },
     { name: "Event", href: "/event", icon: Compass },
   ];
 
-  const moreLinks = [
+  const allMoreLinks = [
     { name: "Akun", href: "/akun", icon: User },
-    { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-    { name: "Acara", href: "/admin/acara", icon: CalendarDays },
-    { name: "Events", href: "/admin/event", icon: CompassIcon },
+    { name: "Scan Barcode", href: "/staf/scan", icon: ScanLine },
+    { name: "Riwayat", href: "/staf/riwayat-scan", icon: History },
+    { name: "Kelola Acara", href: "/admin/acara", icon: CalendarDays },
+    { name: "Kelola Event", href: "/admin/event", icon: CompassIcon },
     { name: "Banner", href: "/admin/banner", icon: Images },
+    { name: "Pengguna", href: "/admin/pengguna", icon: Users },
+    { name: "Staf", href: "/admin/staf", icon: ShieldCheck },
   ];
+
+  const mainHrefs = mainLinks.map((item) => item.href);
+  const moreLinks = allMoreLinks.filter((item) => !mainHrefs.includes(item.href));
 
   return (
     <>
