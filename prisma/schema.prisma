@@ -9,13 +9,15 @@ datasource db {
 }
 
 model pengguna {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email       String   @unique
-  nama        String?
-  peran       String   @default("pengguna")
-  dibuat_pada DateTime @default(now()) @db.Timestamptz
-  diubah_pada DateTime @updatedAt @db.Timestamptz
-  tiket       tiket[]
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String         @unique
+  nama         String?
+  no_telp      String?
+  peran        String         @default("pengguna")
+  dibuat_pada  DateTime       @default(now()) @db.Timestamptz
+  diubah_pada  DateTime       @updatedAt @db.Timestamptz
+  tiket        tiket[]
+  riwayat_scan riwayat_scan[]
 }
 
 model acara {
@@ -68,7 +70,7 @@ model event {
 }
 
 model banner {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   judul            String
   url_gambar       String?
   url_sub_gambar_1 String?
@@ -77,10 +79,10 @@ model banner {
   url_sub_gambar_4 String?
   url_sub_gambar_5 String?
   tautan           String?
-  is_active   Boolean  @default(true)
-  dibuat_pada DateTime @default(now()) @db.Timestamptz
-  diubah_pada DateTime @updatedAt @db.Timestamptz
-  deskripsi   String?
+  is_active        Boolean  @default(true)
+  dibuat_pada      DateTime @default(now()) @db.Timestamptz
+  diubah_pada      DateTime @updatedAt @db.Timestamptz
+  deskripsi        String?
 }
 
 model tiket {
@@ -97,7 +99,21 @@ model tiket {
   dibuat_pada       DateTime @default(now()) @db.Timestamptz
   diubah_pada       DateTime @updatedAt @db.Timestamptz
 
-  acara    acara?   @relation(fields: [id_acara], references: [id], onDelete: Cascade)
-  event    event?   @relation(fields: [id_event], references: [id], onDelete: Cascade)
-  pengguna pengguna @relation(fields: [id_pengguna], references: [id], onDelete: Cascade)
+  acara        acara?         @relation(fields: [id_acara], references: [id], onDelete: Cascade)
+  event        event?         @relation(fields: [id_event], references: [id], onDelete: Cascade)
+  pengguna     pengguna       @relation(fields: [id_pengguna], references: [id], onDelete: Cascade)
+  riwayat_scan riwayat_scan[]
+}
+
+model riwayat_scan {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_tiket    String?  @db.Uuid
+  id_staf     String?  @db.Uuid
+  nama_staf   String?
+  status_scan String
+  pesan       String?
+  dibuat_pada DateTime @default(now()) @db.Timestamptz
+
+  tiket tiket?    @relation(fields: [id_tiket], references: [id], onDelete: SetNull)
+  staf  pengguna? @relation(fields: [id_staf], references: [id], onDelete: SetNull)
 }

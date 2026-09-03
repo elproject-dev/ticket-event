@@ -1,3 +1,4 @@
+import { TopBar } from "@/components/top-bar";
 import { auth } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -25,27 +26,16 @@ export default async function Page() {
   return (
     <div className="flex flex-col min-h-screen pb-20">
       {/* Consistent Header */}
-      <header className="px-4 py-3 flex items-center justify-between border-b bg-background sticky top-0 z-50">
-        <div>
-          <span className="text-sm font-bold tracking-tight">Tiketku.com</span>
-        </div>
-        <nav className="flex items-center gap-3">
-          <Link href="/masuk" className="text-xs font-medium  tracking-wider text-muted-foreground hover:text-primary">
-            Masuk
-          </Link>
-          <Link href="/daftar" className="text-xs font-medium  tracking-wider text-primary">
-            Daftar
-          </Link>
-        </nav>
-      </header>
+      <TopBar />
 
       <main className="flex-1 p-4 space-y-6">
         <div className="flex items-center space-x-4 p-4 border rounded-none bg-muted/20">
           {user.image ? (
-            <img 
-              src={user.image} 
-              alt={user.name || "Profile photo"} 
+            <img
+              src={user.image}
+              alt={user.name || "Profile photo"}
               className="w-12 h-12 rounded-full object-cover border"
+              referrerPolicy="no-referrer"
             />
           ) : (
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center border">
@@ -60,7 +50,7 @@ export default async function Page() {
 
         <div className="space-y-2">
           <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase mb-3">Menu Utama</h3>
-          
+
           <Link href="/profil" className="flex items-center justify-between p-4 border hover:bg-muted/50 transition-colors">
             <div className="flex items-center space-x-3">
               <User className="w-4 h-4 text-muted-foreground" />
@@ -94,10 +84,10 @@ export default async function Page() {
           </Link>
         </div>
 
-        <div className="pt-4">
-          <form action={handleLogout}>
-            <Button variant="destructive" className="w-full rounded-none h-12 text-xs tracking-widest" type="submit">
-              <LogOut className="w-4 h-4 mr-2" />
+        <div className="pt-1 flex justify-end">
+          <form action={handleLogout} className="flex">
+            <Button className="bg-red-600 hover:bg-red-700 text-white rounded-none h-8 px-4 text-xs tracking-widest" type="submit">
+              <LogOut className="w-3.5 h-3.5 mr-2" />
               KELUAR
             </Button>
           </form>

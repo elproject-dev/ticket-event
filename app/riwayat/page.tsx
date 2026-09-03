@@ -1,7 +1,11 @@
+import { TopBar } from "@/components/top-bar";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth/server";
+import { redirect } from "next/navigation";
 import { PayButton } from "@/components/pay-button";
 import { CancelButton } from "@/components/cancel-button";
+import { ConfirmPaymentButton } from "@/components/confirm-payment-button";
 import { TicketDetailsModal } from "@/components/ticket-details-modal";
 import { Button } from "@/components/ui/button";
 
@@ -9,8 +13,14 @@ import { Button } from "@/components/ui/button";
 export const dynamic = "force-dynamic";
 
 export default async function Tiketku() {
-  const pengguna = await prisma.pengguna.findFirst({
-    where: { email: "dummy@example.com" },
+  const { data: session } = await auth.getSession();
+
+  if (!session?.user?.email) {
+    redirect("/masuk");
+  }
+
+  const pengguna = await prisma.pengguna.findUnique({
+    where: { email: session.user.email },
     select: { id: true }
   });
 
@@ -30,19 +40,7 @@ export default async function Tiketku() {
   return (
     <div className="flex flex-col min-h-screen text-xs">
       {/* Consistent Header */}
-      <header className="px-4 py-3 flex items-center justify-between border-b bg-background sticky top-0 z-50">
-        <div>
-          <span className="text-sm font-bold tracking-tight">Tiketku.com</span>
-        </div>
-        <nav className="flex items-center gap-3">
-          <Link href="/masuk" className="text-xs font-medium  tracking-wider text-muted-foreground hover:text-primary">
-            Masuk
-          </Link>
-          <Link href="/daftar" className="text-xs font-medium  tracking-wider text-primary">
-            Daftar
-          </Link>
-        </nav>
-      </header>
+      <TopBar />
 
       <main className="flex-1 pb-24">
 
@@ -100,12 +98,13 @@ export default async function Tiketku() {
                           <div className="flex gap-2">
                             <CancelButton idTiket={tiket.id} />
                             {tiket.snap_token ? (
-                              <PayButton snapToken={tiket.snap_token} />
+                              <PayButton snapToken={tiket.snap_token} idTiket={tiket.id} idPembayaran={tiket.id_pembayaran} />
                             ) : (
                               <Link href={tiket.id_acara ? `/acara/${tiket.id_acara}` : `/event/${tiket.id_event}`} className="text-[10px] font-bold tracking-widest text-primary border border-primary px-3 py-1.5 hover:bg-primary/10 transition-colors bg-primary/5">
                                 Bayar
                               </Link>
                             )}
+                            <ConfirmPaymentButton idTiket={tiket.id} idPembayaran={tiket.id_pembayaran} />
                           </div>
                         )}
                         {!isPending && (

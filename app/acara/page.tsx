@@ -1,3 +1,4 @@
+import { TopBar } from "@/components/top-bar";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ArrowLeft, Compass } from "lucide-react";
@@ -12,19 +13,7 @@ export default async function AcaraPage() {
   return (
     <div className="flex flex-col min-h-screen bg-muted/10 text-xs">
       {/* Consistent Header */}
-      <header className="px-4 py-3 flex items-center justify-between border-b bg-background sticky top-0 z-50">
-        <div>
-          <span className="text-sm font-bold tracking-tight">Tiketku.com</span>
-        </div>
-        <nav className="flex items-center gap-3">
-          <Link href="/masuk" className="text-xs font-medium  tracking-wider text-muted-foreground hover:text-primary">
-            Masuk
-          </Link>
-          <Link href="/daftar" className="text-xs font-medium  tracking-wider text-primary">
-            Daftar
-          </Link>
-        </nav>
-      </header>
+      <TopBar />
 
       <main className="flex-1 p-4 pb-24">
         <div className="container mx-auto">
@@ -41,16 +30,18 @@ export default async function AcaraPage() {
                       className="aspect-video bg-cover bg-center relative border-b border-primary/20"
                       style={{ backgroundImage: `url('${acara.url_gambar || '/tech-banner.jpg'}')` }}
                     >
-                      <div className="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-none uppercase tracking-widest animate-pulse">
-                        Live Now
-                      </div>
-                      <div className="absolute bottom-3 left-3 text-white">
-                        <div className="font-bold text-sm tracking-wide drop-shadow-md">{acara.judul}</div>
-                      </div>
+                      {new Date() >= new Date(acara.tanggal_mulai) && new Date() <= new Date(acara.tanggal_selesai) && (
+                        <div className="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-none uppercase tracking-widest animate-pulse">
+                          Live Now
+                        </div>
+                      )}
                     </div>
                     <div className="p-4 flex flex-col">
+                      <div className="font-bold text-sm text-primary tracking-wide mb-3 line-clamp-1">{acara.judul}</div>
                       <div className="flex flex-col gap-1.5 text-[10px] text-muted-foreground mb-4 tracking-wider">
-                        <div>{new Date(acara.tanggal_mulai).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                        <div>
+                          {new Date(acara.tanggal_mulai).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()} - {new Date(acara.tanggal_selesai).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()}
+                        </div>
                         <div>{acara.lokasi}</div>
                       </div>
                       <div className="flex items-center justify-between border-t border-primary/10 pt-3">

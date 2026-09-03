@@ -1,3 +1,4 @@
+import { TopBar } from "@/components/top-bar";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { User, Ticket, History, Bell, Clapperboard } from "lucide-react";
@@ -27,25 +28,18 @@ export default async function Beranda() {
   ]);
 
   const acaraSaatIni = acaraList || [];
-  const unggulan = eventList?.slice(0, 3) || [];
-  const mendatang = eventList?.slice(3, 6) || [];
+  
+  const now = new Date();
+  const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  
+  const allEvents = eventList || [];
+  const unggulan = allEvents.filter(e => new Date(e.tanggal_mulai) <= sevenDaysFromNow).slice(0, 3);
+  const mendatang = allEvents.filter(e => new Date(e.tanggal_mulai) > sevenDaysFromNow).slice(0, 3);
   return (
     <div className="flex flex-col min-h-screen text-xs">
       <SplashScreen />
       {/* Consistent Header */}
-      <header className="px-4 py-3 flex items-center justify-between border-b bg-background sticky top-0 z-50">
-        <div>
-          <span className="text-sm font-bold tracking-tight">Tiketku.com</span>
-        </div>
-        <nav className="flex items-center gap-3">
-          <Link href="/masuk" className="text-xs font-medium  tracking-wider text-muted-foreground hover:text-primary">
-            Masuk
-          </Link>
-          <Link href="/masuk" className="text-xs font-medium  tracking-wider text-primary">
-            Daftar
-          </Link>
-        </nav>
-      </header>
+      <TopBar />
 
       {/* Hero Section */}
       <main className="flex-1">
@@ -93,16 +87,18 @@ export default async function Beranda() {
                         className="aspect-video bg-cover bg-center relative border-b border-primary/20"
                         style={{ backgroundImage: `url('${acara.url_gambar || '/tech-banner.jpg'}')` }}
                       >
-                        <div className="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-none uppercase tracking-widest animate-pulse">
-                          Live Now
-                        </div>
-                        <div className="absolute bottom-3 left-3 text-white">
-                          <div className="font-bold text-sm tracking-wide drop-shadow-md">{acara.judul}</div>
-                        </div>
+                        {new Date() >= new Date(acara.tanggal_mulai) && new Date() <= new Date(acara.tanggal_selesai) && (
+                          <div className="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-none uppercase tracking-widest animate-pulse">
+                            Live Now
+                          </div>
+                        )}
                       </div>
                       <div className="p-4 flex flex-col">
+                        <div className="font-bold text-sm text-primary tracking-wide mb-3 line-clamp-1">{acara.judul}</div>
                         <div className="flex flex-col gap-1.5 text-[10px] text-muted-foreground mb-4 tracking-wider">
-                          <div>{new Date(acara.tanggal_mulai).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                          <div>
+                            {new Date(acara.tanggal_mulai).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()} - {new Date(acara.tanggal_selesai).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()}
+                          </div>
                           <div>{acara.lokasi}</div>
                         </div>
                         <div className="flex items-center justify-between border-t border-primary/10 pt-3">
@@ -137,13 +133,18 @@ export default async function Beranda() {
                       style={{ backgroundImage: `url('${event.url_gambar || '/tech-banner.jpg'}')` }}
                     >
                       {/* Premium Image Placeholder */}
-                      <div className="absolute bottom-3 left-3 text-white">
-                        <div className="font-bold text-sm tracking-wide ">{event.judul}</div>
-                      </div>
+                      {new Date() >= new Date(event.tanggal_mulai) && new Date() <= new Date(event.tanggal_selesai) && (
+                        <div className="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-none uppercase tracking-widest animate-pulse">
+                          Live Now
+                        </div>
+                      )}
                     </div>
                     <div className="p-4 flex flex-col">
+                      <div className="font-bold text-sm text-primary tracking-wide mb-3 line-clamp-1">{event.judul}</div>
                       <div className="flex flex-col gap-1.5 text-[10px] text-muted-foreground mb-4  tracking-wider">
-                        <div>{new Date(event.tanggal_mulai).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                        <div>
+                          {new Date(event.tanggal_mulai).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()} - {new Date(event.tanggal_selesai).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()}
+                        </div>
                         <div>{event.lokasi}</div>
                       </div>
                       <div className="flex items-center justify-between border-t pt-3">
@@ -178,13 +179,18 @@ export default async function Beranda() {
                       className="aspect-video bg-cover bg-center relative border-b"
                       style={{ backgroundImage: `url('${event.url_gambar || '/tech-banner.jpg'}')` }}
                     >
-                      <div className="absolute bottom-3 left-3 text-white">
-                        <div className="font-bold text-sm tracking-wide ">{event.judul}</div>
-                      </div>
+                      {new Date() >= new Date(event.tanggal_mulai) && new Date() <= new Date(event.tanggal_selesai) && (
+                        <div className="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-none uppercase tracking-widest animate-pulse">
+                          Live Now
+                        </div>
+                      )}
                     </div>
                     <div className="p-4 flex flex-col">
+                      <div className="font-bold text-sm text-primary tracking-wide mb-3 line-clamp-1">{event.judul}</div>
                       <div className="flex flex-col gap-1.5 text-[10px] text-muted-foreground mb-4  tracking-wider">
-                        <div>{new Date(event.tanggal_mulai).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                        <div>
+                          {new Date(event.tanggal_mulai).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()} - {new Date(event.tanggal_selesai).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()}
+                        </div>
                         <div>{event.lokasi}</div>
                       </div>
                       <div className="flex items-center justify-between border-t pt-3">
@@ -195,7 +201,7 @@ export default async function Beranda() {
                   </div>
                 </Link>
               )) : (
-                <p className="text-xs text-muted-foreground text-center py-4 border border-dashed">Belum ada acara mendatang</p>
+                <p className="col-span-full text-xs text-muted-foreground text-center py-4 border border-dashed">Belum ada acara mendatang</p>
               )}
             </div>
           </div>

@@ -28,9 +28,11 @@ import {
   QrCode,
   ClockCounterClockwise,
   User,
-  ImageSquare
+  ImageSquare,
+  IdentificationBadge
 } from "@phosphor-icons/react"
 
+import { usePathname } from "next/navigation"
 import { authClient } from "@/lib/auth/client"
 
 const data = {
@@ -39,37 +41,31 @@ const data = {
       title: "Beranda",
       url: "/",
       icon: <House />,
-      isActive: true,
     },
     {
       title: "Acara",
       url: "/acara",
       icon: <CalendarBlank />,
-      isActive: false,
     },
     {
       title: "Event",
       url: "/event",
       icon: <Compass />,
-      isActive: false,
     },
     {
       title: "Barcode",
       url: "/barcode",
       icon: <QrCode />,
-      isActive: false,
     },
     {
       title: "Riwayat",
       url: "/riwayat",
       icon: <ClockCounterClockwise />,
-      isActive: false,
     },
     {
       title: "Akun",
       url: "/akun",
       icon: <User />,
-      isActive: false,
     },
   ],
   navAdmin: [
@@ -77,43 +73,56 @@ const data = {
       title: "Dashboard",
       url: "/admin",
       icon: <ChartPieSlice />,
-      isActive: false,
     },
     {
       title: "Kelola Pengguna",
       url: "/admin/pengguna",
       icon: <Users />,
-      isActive: false,
+    },
+    {
+      title: "Kelola Staf",
+      url: "/admin/staf",
+      icon: <IdentificationBadge />,
     },
     {
       title: "Kelola Event",
       url: "/admin/event",
       icon: <Compass />,
-      isActive: false,
     },
     {
       title: "Kelola Acara",
       url: "/admin/acara",
       icon: <CalendarBlank />,
-      isActive: false,
     },
     {
       title: "Kelola Banner",
       url: "/admin/banner",
       icon: <ImageSquare />,
-      isActive: false,
     },
     {
       title: "Pengaturan",
       url: "/admin/pengaturan",
       icon: <Gear />,
-      isActive: false,
+    },
+  ],
+  navStaff: [
+    {
+      title: "Scan Barcode",
+      url: "/staf/scan",
+      icon: <QrCode />,
+    },
+    {
+      title: "Riwayat Validasi",
+      url: "/staf/riwayat-scan",
+      icon: <ClockCounterClockwise />,
     },
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session } = authClient.useSession();
+export function AppSidebar({ initialSession, ...props }: React.ComponentProps<typeof Sidebar> & { initialSession?: any }) {
+  const pathname = usePathname();
+  const { data: clientSession } = authClient.useSession();
+  const session = clientSession || initialSession;
   
   const userData = session?.user ? {
     name: session.user.name || "Pengguna",
@@ -124,6 +133,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     email: "Belum login",
     avatar: "",
   };
+
+  const navMain = data.navMain.map((item) => ({
+    ...item,
+    isActive: item.url === "/" 
+      ? pathname === "/" 
+      : pathname === item.url || pathname.startsWith(item.url + "/"),
+  }));
+
+  const navStaff = data.navStaff.map((item) => ({
+    ...item,
+    isActive: pathname === item.url || pathname.startsWith(item.url + "/"),
+  }));
+
+  const navAdmin = data.navAdmin.map((item) => ({
+    ...item,
+    isActive: item.url === "/admin" 
+      ? pathname === "/admin" 
+      : pathname === item.url || pathname.startsWith(item.url + "/"),
+  }));
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -141,8 +169,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain label="Menu Utama" items={data.navMain} />
-        <NavMain label="Administrator" items={data.navAdmin} />
+        <NavMain label="Menu Utama" items={navMain} />
+        <NavMain label="Staf" items={navStaff} />
+        <NavMain label="Administrator" items={navAdmin} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={userData} />

@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button";
 
 interface PayButtonProps {
   snapToken: string;
+  idTiket?: string;
+  idPembayaran?: string | null;
 }
 
-export function PayButton({ snapToken }: PayButtonProps) {
+export function PayButton({ snapToken, idTiket, idPembayaran }: PayButtonProps) {
   const [isSnapLoaded, setIsSnapLoaded] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     // Cek apakah snap sudah ter-load (jika script dieksekusi cepat)
@@ -18,6 +21,27 @@ export function PayButton({ snapToken }: PayButtonProps) {
     }
   }, []);
 
+  const confirmPayment = async (orderId?: string) => {
+    try {
+      setIsProcessing(true);
+      await fetch("/api/payment/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          order_id: orderId || idPembayaran,
+          id_tiket: idTiket,
+          status: "VALID",
+        }),
+      });
+      window.location.reload();
+    } catch (err) {
+      console.error("Gagal update status pembayaran:", err);
+      window.location.reload();
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handlePay = () => {
     if (!isSnapLoaded || !window.snap) {
       alert("Menunggu sistem pembayaran dimuat...");
@@ -25,20 +49,20 @@ export function PayButton({ snapToken }: PayButtonProps) {
     }
 
     window.snap.pay(snapToken, {
-      onSuccess: function(result: any) {
+      onSuccess: function (result: any) {
         console.log("Payment success:", result);
-        window.location.reload();
+        confirmPayment(result?.order_id);
       },
-      onPending: function(result: any) {
+      onPending: function (result: any) {
         console.log("Payment pending:", result);
       },
-      onError: function(result: any) {
+      onError: function (result: any) {
         console.error("Payment error:", result);
         alert("Pembayaran gagal. Silakan coba lagi.");
       },
-      onClose: function() {
-        console.log('User closed the popup without finishing the payment');
-      }
+      onClose: function () {
+        console.log("User closed the popup without finishing the payment");
+      },
     });
   };
 

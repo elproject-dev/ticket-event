@@ -1,12 +1,23 @@
+import { TopBar } from "@/components/top-bar";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth/server";
+import { redirect } from "next/navigation";
 import QRCode from "react-qr-code";
 import { ArrowLeft, Box } from "lucide-react";
 import { BoxArrowUpIcon, BoxArrowDownIcon } from "@phosphor-icons/react";
 
+export const dynamic = "force-dynamic";
+
 export default async function ETiketScannerFast() {
-  const pengguna = await prisma.pengguna.findFirst({
-    where: { email: "dummy@example.com" },
+  const { data: session } = await auth.getSession();
+
+  if (!session?.user?.email) {
+    redirect("/masuk");
+  }
+
+  const pengguna = await prisma.pengguna.findUnique({
+    where: { email: session.user.email },
     select: { id: true }
   });
 
@@ -29,19 +40,7 @@ export default async function ETiketScannerFast() {
     return (
       <div className="flex flex-col min-h-screen text-xs bg-background">
         {/* Consistent Header */}
-        <header className="px-4 py-3 flex items-center justify-between border-b bg-background sticky top-0 z-50">
-          <div>
-            <span className="text-sm font-bold tracking-tight">Tiketku.com</span>
-          </div>
-          <nav className="flex items-center gap-3">
-            <Link href="/masuk" className="text-xs font-medium  tracking-wider text-muted-foreground hover:text-primary">
-              Masuk
-            </Link>
-            <Link href="/daftar" className="text-xs font-medium  tracking-wider text-primary">
-              Daftar
-            </Link>
-          </nav>
-        </header>
+        <TopBar />
 
         <main className="flex-1 flex flex-col items-center justify-center p-6 mb-12">
           <div className="text-center flex flex-col items-center max-w-sm">
@@ -72,19 +71,7 @@ export default async function ETiketScannerFast() {
   return (
     <div className="flex flex-col min-h-screen text-xs bg-black text-white">
       {/* Consistent Header */}
-      <header className="px-4 py-3 flex items-center justify-between border-b bg-background sticky top-0 z-50">
-        <div>
-          <span className="text-sm font-bold tracking-tight text-foreground">Tiketku.com</span>
-        </div>
-        <nav className="flex items-center gap-3">
-          <Link href="/masuk" className="text-xs font-medium  tracking-wider text-muted-foreground hover:text-primary">
-            Masuk
-          </Link>
-          <Link href="/daftar" className="text-xs font-medium  tracking-wider text-primary">
-            Daftar
-          </Link>
-        </nav>
-      </header>
+      <TopBar />
 
       {/* Konten Utama */}
       <main className="flex-1 flex flex-col items-center justify-center p-6 mb-12">

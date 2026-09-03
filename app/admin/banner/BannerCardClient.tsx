@@ -6,7 +6,7 @@ import { banner } from "@prisma/client";
 import { hapusBanner } from "@/app/admin/banner/actions";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { MoreVertical, Edit, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -60,7 +60,7 @@ export default function BannerCardClient({ banner }: { banner: banner }) {
           <div className="absolute top-2 right-2" onClick={(e) => e.stopPropagation()}>
             <DropdownMenu>
               <DropdownMenuTrigger className="flex h-7 w-7 items-center justify-center rounded-none bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 text-foreground">
-                <MoreHorizontal className="h-4 w-4" />
+                <MoreVertical className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="rounded-none">
                 <DropdownMenuItem onClick={handleEdit} className="rounded-none cursor-pointer" disabled={isPending}>

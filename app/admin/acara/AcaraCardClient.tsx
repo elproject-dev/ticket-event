@@ -6,7 +6,7 @@ import { acara } from "@prisma/client";
 import { hapusAcara } from "@/app/admin/acara/actions";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { MoreVertical, Edit, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -69,7 +69,7 @@ export default function AcaraCardClient({ acara }: { acara: acara }) {
           <div className="absolute top-2 right-2" onClick={(e) => e.stopPropagation()}>
             <DropdownMenu>
               <DropdownMenuTrigger className="flex h-7 w-7 items-center justify-center rounded-none bg-background/80 backdrop-blur-sm shadow-sm hover:bg-background/90 text-foreground">
-                <MoreHorizontal className="h-4 w-4" />
+                <MoreVertical className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="rounded-none">
                 <DropdownMenuItem onClick={handleEdit} className="rounded-none cursor-pointer" disabled={isPending}>
@@ -104,7 +104,7 @@ export default function AcaraCardClient({ acara }: { acara: acara }) {
       </Card>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="rounded-none sm:rounded-none max-w-sm max-h-[90vh] overflow-y-auto p-4">
+        <DialogContent className="rounded-none sm:rounded-md w-[95vw] max-w-sm md:max-w-2xl lg:max-w-3xl max-h-[90vh] overflow-y-auto p-4 md:p-6">
           <DialogHeader className="mb-2">
             <DialogTitle className="text-lg leading-tight">{acara.judul}</DialogTitle>
           </DialogHeader>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import midtransClient from "midtrans-client";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth/server";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
@@ -10,19 +11,40 @@ export async function POST(req: Request) {
 
     const orderId = `TRX-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-    // Buat data dummy untuk Pengguna dan Acara agar tidak error constraint
-    let dummyUser = await prisma.pengguna.findFirst({
-      where: { email: "dummy@example.com" }
-    });
+    const { data: session } = await auth.getSession();
 
-    if (!dummyUser) {
-      dummyUser = await prisma.pengguna.create({
-        data: {
-          email: "dummy@example.com",
-          nama: "Dummy User",
-          diubah_pada: new Date()
-        }
+    let currentUser = null;
+
+    if (session?.user?.email) {
+      currentUser = await prisma.pengguna.findUnique({
+        where: { email: session.user.email },
       });
+
+      if (!currentUser) {
+        currentUser = await prisma.pengguna.create({
+          data: {
+            email: session.user.email,
+            nama: session.user.name || "Pengguna",
+            diubah_pada: new Date(),
+          },
+        });
+      }
+    }
+
+    if (!currentUser) {
+      currentUser = await prisma.pengguna.findFirst({
+        where: { email: "dummy@example.com" },
+      });
+
+      if (!currentUser) {
+        currentUser = await prisma.pengguna.create({
+          data: {
+            email: "dummy@example.com",
+            nama: "Pengguna Tamu",
+            diubah_pada: new Date(),
+          },
+        });
+      }
     }
 
     let itemFound = false;
@@ -44,7 +66,7 @@ export async function POST(req: Request) {
       data: {
         id_acara: id_acara || null,
         id_event: id_event || null,
-        id_pengguna: dummyUser.id,
+        id_pengguna: currentUser.id,
         qr_code: crypto.randomBytes(16).toString("hex"),
         id_pembayaran: orderId,
         status_bayar: "pending",
@@ -94,10 +116,10 @@ export async function POST(req: Request) {
       },
       item_details: item_details,
       customer_details: {
-        first_name: "Dummy",
-        last_name: "User",
-        email: "dummy@example.com",
-        phone: "08123456789"
+        first_name: currentUser.nama || "Pengguna",
+        last_name: "",
+        email: currentUser.email,
+        phone: currentUser.no_telp || "08123456789"
       }
     };
 

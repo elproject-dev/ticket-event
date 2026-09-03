@@ -1,8 +1,11 @@
 import { auth } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, User, Mail, Shield } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ChevronLeft, User, Mail, Shield, AlertTriangle, Phone } from "lucide-react";
+import { PrismaClient } from "@prisma/client";
+import { PhoneDialog } from "./phone-dialog";
+
+const prisma = new PrismaClient();
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +19,16 @@ export default async function ProfilPage() {
     redirect("/masuk");
   }
 
+  const dbUser = (await prisma.pengguna.findUnique({
+    where: { email: session.user.email },
+  })) as any;
+
+  if (!dbUser) {
+    redirect("/masuk");
+  }
+
   const user = session.user;
+  const isPhoneVerified = !!dbUser.no_telp; 
 
   return (
     <div className="flex flex-col min-h-screen bg-muted/10 pb-20">
@@ -28,14 +40,39 @@ export default async function ProfilPage() {
         <h1 className="text-sm font-bold tracking-tight">Profil Saya</h1>
       </header>
 
-      <main className="flex-1 p-4 space-y-6 max-w-lg mx-auto w-full">
+      <main className="flex-1 p-4 space-y-6">
+        {/* Pesan Peringatan Kuning jika belum verifikasi no telp */}
+        {!isPhoneVerified && (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-yellow-700">
+                  <strong className="font-bold">Perhatian:</strong> Anda belum melakukan verifikasi nomor telepon. Untuk pemesanan tiket online{" "}
+                  <PhoneDialog
+                    initialPhone={dbUser.no_telp}
+                    trigger={
+                      <button type="button" className="font-medium underline hover:text-yellow-600 cursor-pointer bg-transparent border-0 p-0 text-yellow-700 font-sans text-sm">
+                        Verifikasi sekarang
+                      </button>
+                    }
+                  />
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Foto Profil */}
         <div className="flex flex-col items-center justify-center py-6 space-y-4 bg-background border p-4">
           <div className="relative">
             {user.image ? (
-              <img 
-                src={user.image} 
-                alt={user.name || "Profile photo"} 
+              <img
+                src={user.image}
+                alt={user.name || "Profile photo"}
+                referrerPolicy="no-referrer"
                 className="w-24 h-24 rounded-full object-cover border-4 border-muted"
               />
             ) : (
@@ -46,16 +83,18 @@ export default async function ProfilPage() {
           </div>
           <div className="text-center">
             <h2 className="font-bold text-lg">{user.name || "Pengguna"}</h2>
-            <span className="inline-flex items-center mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-              Terverifikasi
-            </span>
+            {isPhoneVerified && (
+              <span className="inline-flex items-center mt-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-green-600 text-white shadow-sm uppercase tracking-wider">
+                Terverifikasi
+              </span>
+            )}
           </div>
         </div>
 
         {/* Informasi Pribadi */}
         <div className="space-y-3">
           <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase">Informasi Akun</h3>
-          
+
           <div className="bg-background border divide-y">
             <div className="p-4 flex items-center space-x-4">
               <User className="w-5 h-5 text-muted-foreground" />
@@ -64,12 +103,25 @@ export default async function ProfilPage() {
                 <p className="text-sm font-medium">{user.name || "Belum diatur"}</p>
               </div>
             </div>
-            
+
             <div className="p-4 flex items-center space-x-4">
               <Mail className="w-5 h-5 text-muted-foreground" />
               <div className="flex-1">
                 <p className="text-xs text-muted-foreground">Email</p>
                 <p className="text-sm font-medium">{user.email}</p>
+              </div>
+            </div>
+
+            <div className="p-4 flex items-center space-x-4">
+              <Phone className="w-5 h-5 text-muted-foreground" />
+              <div className="flex-1 flex justify-between items-center">
+                <div>
+                  <p className="text-xs text-muted-foreground">Nomor Telepon</p>
+                  <p className="text-sm font-medium">
+                    {dbUser.no_telp ? dbUser.no_telp : <span className="text-muted-foreground">Belum diatur</span>}
+                  </p>
+                </div>
+                <PhoneDialog initialPhone={dbUser.no_telp} />
               </div>
             </div>
 

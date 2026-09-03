@@ -159,7 +159,7 @@ export default function EditEventClient({ event }: { event: Event }) {
 
   return (
     <>
-      <div className="sticky top-0 z-50 flex items-center justify-between px-4 py-1 bg-white border-b">
+      <div className="sticky top-0 z-50 flex items-center justify-between px-4 py-1 bg-background border-b">
         <Link href="/admin/event" className="p-2 -ml-2 rounded-none hover:bg-muted transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>

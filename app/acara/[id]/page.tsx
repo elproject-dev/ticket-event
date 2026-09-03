@@ -1,3 +1,4 @@
+import { TopBar } from "@/components/top-bar";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -25,36 +26,23 @@ export default async function DetailAcara({ params }: { params: Promise<{ id: st
   return (
     <div className="flex flex-col min-h-screen text-xs">
       {/* Consistent Header */}
-      <header className="px-4 py-3 flex items-center justify-between border-b bg-background sticky top-0 z-50">
-        <div>
-          <span className="text-sm font-bold tracking-tight ">Tiketku.com</span>
-        </div>
-        <nav className="flex items-center gap-3">
-          <Link href="/masuk" className="text-xs font-medium  tracking-wider text-muted-foreground hover:text-primary">
-            Masuk
-          </Link>
-          <Link href="/daftar" className="text-xs font-medium  tracking-wider text-primary">
-            Daftar
-          </Link>
-        </nav>
-      </header>
+      <TopBar />
 
-      <main className="flex-1 pb-48">
-        <div className="container mx-auto px-4 py-6">
-          <div className="relative z-10">
-            <div className="grid grid-cols-1 gap-6">
-              <div className="space-y-6">
-                <div>
-                  <h1 className="text-xl font-bold mb-4 leading-tight tracking-wide">{acara.judul}</h1>
-                  <SubPhotoGallery 
-                    mainImg={acara.url_gambar}
-                    img1={acara.url_sub_gambar_1} 
-                    img2={acara.url_sub_gambar_2} 
-                    img3={acara.url_sub_gambar_3} 
-                    img4={acara.url_sub_gambar_4} 
-                    img5={acara.url_sub_gambar_5} 
-                  />
-                </div>
+      <main className="flex-1 pb-8 mt-4">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-1 gap-6">
+            <div className="space-y-6">
+              <div>
+                <h1 className="text-xl font-bold mb-4 leading-tight tracking-wide">{acara.judul}</h1>
+                <SubPhotoGallery 
+                  mainImg={acara.url_gambar}
+                  img1={acara.url_sub_gambar_1} 
+                  img2={acara.url_sub_gambar_2} 
+                  img3={acara.url_sub_gambar_3} 
+                  img4={acara.url_sub_gambar_4} 
+                  img5={acara.url_sub_gambar_5} 
+                />
+              </div>
 
               <div className="flex flex-col gap-4 py-5 border-y">
                 <div className="flex justify-between items-center border-b pb-3">
@@ -91,7 +79,6 @@ export default async function DetailAcara({ params }: { params: Promise<{ id: st
                 <h2 className="text-sm font-bold mb-3  tracking-widest">Tentang Acara Ini</h2>
                 <div className="text-xs text-muted-foreground leading-relaxed space-y-3 whitespace-pre-wrap">
                   {acara.deskripsi}
-                </div>
                 </div>
               </div>
             </div>

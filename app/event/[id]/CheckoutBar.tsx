@@ -38,9 +38,22 @@ export default function CheckoutBar({ event }: { event: any }) {
 
       if (data.token) {
         window.snap.pay(data.token, {
-          onSuccess: function (result: any) {
+          onSuccess: async function (result: any) {
             console.log("Success", result);
-            alert("Pembayaran berhasil! Tiket sedang diproses.");
+            try {
+              await fetch("/api/payment/confirm", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  order_id: result?.order_id || data.orderId,
+                  status: "VALID"
+                })
+              });
+            } catch (e) {
+              console.error(e);
+            }
+            alert("Pembayaran berhasil! Tiket Anda telah aktif.");
+            window.location.href = "/riwayat";
           },
           onPending: function (result: any) {
             console.log("Pending", result);

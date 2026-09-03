@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-const outfit = Outfit({subsets:['latin'],variable:'--font-sans'});
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-sans' });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,7 +44,29 @@ import { AppSidebar } from "@/components/app-sidebar";
 
 import { BottomNavigation } from "@/components/bottom-navigation";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+import { auth } from "@/lib/auth/server";
+
+import { prisma } from "@/lib/prisma";
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { data: session } = await auth.getSession();
+
+  if (session?.user?.email) {
+    const existingUser = await prisma.pengguna.findUnique({
+      where: { email: session.user.email },
+    });
+    
+    if (!existingUser) {
+      await prisma.pengguna.create({
+        data: {
+          email: session.user.email,
+          nama: session.user.name || "Pengguna",
+          peran: "pengguna",
+        },
+      });
+    }
+  }
+
   return (
     <html
       lang="en"
@@ -54,12 +76,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SidebarProvider
           style={
             {
-              "--sidebar-width": "calc(var(--spacing) * 72)",
+              "--sidebar-width": "15rem",
               "--header-height": "calc(var(--spacing) * 12)",
             } as React.CSSProperties
           }
         >
-          <AppSidebar />
+          <AppSidebar initialSession={session} />
           <SidebarInset>
             <div className="flex flex-1 flex-col pb-16 md:pb-0">
               {children}
@@ -67,7 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </SidebarInset>
         </SidebarProvider>
         <BottomNavigation />
-        <Script 
+        <Script
           src="https://app.sandbox.midtrans.com/snap/snap.js"
           data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
           strategy="afterInteractive"

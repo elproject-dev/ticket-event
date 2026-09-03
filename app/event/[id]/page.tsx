@@ -1,3 +1,4 @@
+import { TopBar } from "@/components/top-bar";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
@@ -26,19 +27,7 @@ export default async function DetailEvent({ params }: { params: Promise<{ id: st
   return (
     <div className="flex flex-col min-h-screen text-xs">
       {/* Consistent Header */}
-      <header className="px-4 py-3 flex items-center justify-between border-b bg-background sticky top-0 z-50">
-        <div>
-          <span className="text-sm font-bold tracking-tight ">ManajemenTiket</span>
-        </div>
-        <nav className="flex items-center gap-3">
-          <Link href="/masuk" className="text-xs font-medium  tracking-wider text-muted-foreground hover:text-primary">
-            Masuk
-          </Link>
-          <Link href="/daftar" className="text-xs font-medium  tracking-wider text-primary">
-            Daftar
-          </Link>
-        </nav>
-      </header>
+      <TopBar title="ManajemenTiket" />
 
       <main className="flex-1 pb-8 mt-4">
         <div className="container mx-auto px-4 relative z-10">

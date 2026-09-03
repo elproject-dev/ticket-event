@@ -115,7 +115,7 @@ export default function ScanBarcodePage() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-zinc-500">Acara</span>
-                          <span className="font-bold text-right max-w-[150px] line-clamp-1">{validationResult.ticketData.event?.judul}</span>
+                          <span className="font-bold text-right max-w-[150px] line-clamp-1">{validationResult.ticketData.event?.judul || validationResult.ticketData.acara?.judul || "Tiket Event"}</span>
                         </div>
                       </div>
                     )}
