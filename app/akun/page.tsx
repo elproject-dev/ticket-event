@@ -1,5 +1,6 @@
 import { TopBar } from "@/components/top-bar";
 import { auth } from "@/lib/auth/server";
+import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight, LogOut, Bell, HelpCircle, User, Ticket } from "lucide-react";
@@ -14,7 +15,14 @@ export default async function Page() {
     redirect("/masuk");
   }
 
+  // Ambil nama dari database, bukan dari session Google
+  const dbUser = await prisma.pengguna.findUnique({
+    where: { email: session.user.email! },
+    select: { nama: true, no_telp: true },
+  });
+
   const user = session.user;
+  const displayName = dbUser?.nama || user.name || "Pengguna";
 
   // Handle logout action
   const handleLogout = async () => {
@@ -24,16 +32,16 @@ export default async function Page() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen pb-20">
+    <div className="fixed inset-0 flex flex-col bg-background text-foreground overflow-hidden pb-16">
       {/* Consistent Header */}
-      <TopBar />
+      <TopBar title="Tiketku.com" />
 
-      <main className="flex-1 p-4 space-y-6">
+      <main className="flex-1 p-4 space-y-4 flex flex-col justify-start overflow-hidden">
         <div className="flex items-center space-x-4 p-4 border rounded-none bg-muted/20">
           {user.image ? (
             <img
               src={user.image}
-              alt={user.name || "Profile photo"}
+              alt={displayName}
               className="w-12 h-12 rounded-full object-cover border"
               referrerPolicy="no-referrer"
             />
@@ -43,13 +51,13 @@ export default async function Page() {
             </div>
           )}
           <div>
-            <h2 className="font-bold text-sm">{user.name || "Pengguna"}</h2>
+            <h2 className="font-bold text-sm">{displayName}</h2>
             <p className="text-xs text-muted-foreground">{user.email}</p>
           </div>
         </div>
 
         <div className="space-y-2">
-          <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase mb-3">Menu Utama</h3>
+          <h3 className="text-xs font-bold tracking-widest text-muted-foreground uppercase mb-2">Menu Utama</h3>
 
           <Link href="/profil" className="flex items-center justify-between p-4 border hover:bg-muted/50 transition-colors">
             <div className="flex items-center space-x-3">
@@ -84,7 +92,7 @@ export default async function Page() {
           </Link>
         </div>
 
-        <div className="pt-1 flex justify-end">
+        <div className="mt-auto pt-2 flex justify-end">
           <form action={handleLogout} className="flex">
             <Button className="bg-red-600 hover:bg-red-700 text-white rounded-none h-8 px-4 text-xs tracking-widest" type="submit">
               <LogOut className="w-3.5 h-3.5 mr-2" />

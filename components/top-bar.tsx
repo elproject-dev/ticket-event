@@ -6,9 +6,9 @@ export async function TopBar({ title = "Tiketku.com" }: { title?: string }) {
   const { data: session } = await auth.getSession()
 
   return (
-    <header className="px-4 py-3 flex items-center justify-between border-b bg-background sticky top-0 z-50">
+    <header className="px-4 py-3 flex items-center justify-between border-b border-border bg-background text-foreground sticky top-0 z-50 w-full shrink-0">
       <div>
-        <span className="text-sm font-bold tracking-tight">{title}</span>
+        <span className="text-sm font-bold tracking-tight text-foreground">{title}</span>
       </div>
       <nav className="flex items-center gap-3">
         {session?.user ? (

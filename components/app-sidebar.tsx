@@ -35,39 +35,17 @@ import {
 import { usePathname } from "next/navigation"
 import { authClient } from "@/lib/auth/client"
 
+// Menu untuk pengguna biasa (5 item)
+const navUser = [
+  { title: "Beranda", url: "/", icon: <House /> },
+  { title: "Acara", url: "/acara", icon: <CalendarBlank /> },
+  { title: "Barcode", url: "/barcode", icon: <QrCode /> },
+  { title: "Event", url: "/event", icon: <Compass /> },
+  { title: "Akun", url: "/akun", icon: <User /> },
+];
+
 const data = {
-  navMain: [
-    {
-      title: "Beranda",
-      url: "/",
-      icon: <House />,
-    },
-    {
-      title: "Acara",
-      url: "/acara",
-      icon: <CalendarBlank />,
-    },
-    {
-      title: "Event",
-      url: "/event",
-      icon: <Compass />,
-    },
-    {
-      title: "Barcode",
-      url: "/barcode",
-      icon: <QrCode />,
-    },
-    {
-      title: "Riwayat",
-      url: "/riwayat",
-      icon: <ClockCounterClockwise />,
-    },
-    {
-      title: "Akun",
-      url: "/akun",
-      icon: <User />,
-    },
-  ],
+  navMain: navUser,
   navAdmin: [
     {
       title: "Dashboard",
@@ -123,11 +101,38 @@ export function AppSidebar({ initialSession, ...props }: React.ComponentProps<ty
   const pathname = usePathname();
   const { data: clientSession } = authClient.useSession();
   const session = clientSession || initialSession;
-  
+
+  const [dbUser, setDbUser] = React.useState<{ name: string; email: string; image: string } | null>(null);
+  const [userRole, setUserRole] = React.useState<string>("pengguna");
+
+  React.useEffect(() => {
+    if (session?.user?.email) {
+      fetch("/api/user/profile")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.user) {
+            setDbUser({
+              name: data.user.name,
+              email: data.user.email,
+              image: data.user.image || "",
+            });
+            setUserRole(data.user.peran || "pengguna");
+          }
+        })
+        .catch(() => {});
+    } else {
+      setDbUser(null);
+      setUserRole("pengguna");
+    }
+  }, [session?.user?.email]);
+
+  const isStaff = userRole === "staf";
+  const isAdmin = userRole === "admin";
+
   const userData = session?.user ? {
-    name: session.user.name || "Pengguna",
-    email: session.user.email || "",
-    avatar: session.user.image || "",
+    name: dbUser?.name || session.user.name || "Pengguna",
+    email: dbUser?.email || session.user.email || "",
+    avatar: dbUser?.image || session.user.image || "",
   } : {
     name: "Tamu",
     email: "Belum login",
@@ -141,17 +146,17 @@ export function AppSidebar({ initialSession, ...props }: React.ComponentProps<ty
       : pathname === item.url || pathname.startsWith(item.url + "/"),
   }));
 
-  const navStaff = data.navStaff.map((item) => ({
+  const navStaff = (isStaff || isAdmin) ? data.navStaff.map((item) => ({
     ...item,
     isActive: pathname === item.url || pathname.startsWith(item.url + "/"),
-  }));
+  })) : [];
 
-  const navAdmin = data.navAdmin.map((item) => ({
+  const navAdmin = isAdmin ? data.navAdmin.map((item) => ({
     ...item,
     isActive: item.url === "/admin" 
       ? pathname === "/admin" 
       : pathname === item.url || pathname.startsWith(item.url + "/"),
-  }));
+  })) : [];
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -170,8 +175,8 @@ export function AppSidebar({ initialSession, ...props }: React.ComponentProps<ty
       </SidebarHeader>
       <SidebarContent>
         <NavMain label="Menu Utama" items={navMain} />
-        <NavMain label="Staf" items={navStaff} />
-        <NavMain label="Administrator" items={navAdmin} />
+        {(isStaff || isAdmin) && <NavMain label="Staf" items={navStaff} />}
+        {isAdmin && <NavMain label="Administrator" items={navAdmin} />}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={userData} />

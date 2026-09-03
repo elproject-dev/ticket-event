@@ -3,9 +3,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
-import QRCode from "react-qr-code";
-import { ArrowLeft, Box } from "lucide-react";
-import { BoxArrowUpIcon, BoxArrowDownIcon } from "@phosphor-icons/react";
+import { Box } from "lucide-react";
+import ETiketCarousel from "./carousel";
 
 export const dynamic = "force-dynamic";
 
@@ -21,28 +20,44 @@ export default async function ETiketScannerFast() {
     select: { id: true }
   });
 
-  const tiket = pengguna ? await prisma.tiket.findFirst({
+  // Ambil semua tiket yang sudah dibayar
+  const semuaTiket = pengguna ? await prisma.tiket.findMany({
     where: {
       id_pengguna: pengguna.id,
-      status: { in: ["VALID", "TERPAKAI"] }
+      status: "VALID"
     },
     include: {
       acara: true,
       event: true,
-      pengguna: true
+      pengguna: { select: { nama: true } }
     },
-    orderBy: {
-      dibuat_pada: "asc"
-    }
-  }) : null;
+    orderBy: { dibuat_pada: "desc" }
+  }) : [];
 
-  if (!tiket) {
+  // Logika pintar: Urutkan berdasarkan tanggal acara terdekat
+  const now = new Date();
+
+  const tiketList = semuaTiket
+    .map(t => {
+      const item = t.acara || t.event;
+      const tanggalMulai = item?.tanggal_mulai ? new Date(item.tanggal_mulai) : null;
+      return { ...t, _tanggalMulai: tanggalMulai };
+    })
+    .sort((a, b) => {
+      const dateA = a._tanggalMulai?.getTime() ?? Infinity;
+      const dateB = b._tanggalMulai?.getTime() ?? Infinity;
+      const isAFuture = dateA >= now.getTime();
+      const isBFuture = dateB >= now.getTime();
+      if (isAFuture && !isBFuture) return -1;
+      if (!isAFuture && isBFuture) return 1;
+      return dateA - dateB;
+    });
+
+  if (tiketList.length === 0) {
     return (
-      <div className="flex flex-col min-h-screen text-xs bg-background">
-        {/* Consistent Header */}
-        <TopBar />
-
-        <main className="flex-1 flex flex-col items-center justify-center p-6 mb-12">
+      <div className="fixed inset-0 bg-background text-foreground flex flex-col overflow-hidden text-xs pb-16">
+        <TopBar title="Tiketku.com" />
+        <main className="flex-1 flex flex-col items-center justify-center p-6 my-auto overflow-hidden">
           <div className="text-center flex flex-col items-center max-w-sm">
             <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6">
               <Box className="w-12 h-12 text-muted-foreground" />
@@ -65,61 +80,13 @@ export default async function ETiketScannerFast() {
     );
   }
 
-  const item = tiket.acara || tiket.event;
+  // Serialisasi untuk menghindari error Decimal pada Client Component
+  const tiketListPlain = JSON.parse(JSON.stringify(tiketList));
 
-  // Jika tiket ditemukan, langsung tampilkan layar hitam premium
   return (
-    <div className="flex flex-col min-h-screen text-xs bg-black text-white">
-      {/* Consistent Header */}
-      <TopBar />
-
-      {/* Konten Utama */}
-      <main className="flex-1 flex flex-col items-center justify-center p-6 mb-12">
-        <div className="w-full max-w-sm flex flex-col items-center">
-
-          <div className="text-center mb-10">
-            <h1 className="text-xl font-bold tracking-widest uppercase leading-snug mb-2 text-white">{item?.judul}</h1>
-            <p className="text-[10px] text-white/60 uppercase tracking-widest">
-              {item?.tanggal_mulai ? new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : ''} • {item?.lokasi}
-            </p>
-          </div>
-
-          {/* Area QR Code - Harus sangat kontras */}
-          <div className="bg-white p-6 w-full aspect-square flex items-center justify-center relative">
-            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-black m-2"></div>
-            <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-black m-2"></div>
-            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-black m-2"></div>
-            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-black m-2"></div>
-
-            <QRCode
-              value={tiket.qr_code}
-              size={256}
-              style={{ height: "100%", maxWidth: "100%", width: "100%" }}
-              viewBox={`0 0 256 256`}
-            />
-          </div>
-
-          {/* Info Pendukung */}
-          <div className="mt-10 w-full flex flex-col gap-4">
-            <div className="flex justify-between items-end border-b border-white/20 pb-2">
-              <span className="text-[10px] text-white/50 tracking-widest">Nama Pemegang</span>
-              <span className="text-xs font-bold tracking-wider uppercase">{tiket.pengguna.nama}</span>
-            </div>
-            <div className="flex justify-between items-end border-b border-white/20 pb-2">
-              <span className="text-[10px] text-white/50 tracking-widest">ID Tiket</span>
-              <span className="text-xs font-bold tracking-wider uppercase">{tiket.id.split('-')[0]}</span>
-            </div>
-            <div className="flex justify-between items-end border-b border-white/20 pb-2">
-              <span className="text-[10px] text-white/50 tracking-widest">Status</span>
-              <span className="text-xs font-bold tracking-wider text-green-400 uppercase">{tiket.status === "VALID" ? "Valid" : "Terpakai"}</span>
-            </div>
-          </div>
-
-          <p className="mt-12 text-center text-[9px] text-white/40 tracking-widest leading-relaxed">
-            Tunjukkan layar ini kepada petugas di pintu masuk. Pastikan kecerahan layar Anda maksimal.
-          </p>
-        </div>
-      </main>
+    <div className="fixed inset-0 bg-black flex flex-col overflow-hidden text-xs z-40">
+      <TopBar title="Tiketku.com" />
+      <ETiketCarousel tiketList={tiketListPlain} />
     </div>
   );
 }

@@ -28,10 +28,23 @@ export function TicketDetailsModal({ tiket }: TicketDetailsModalProps) {
   };
 
 
+  const item = tiket.acara || tiket.event;
+  const isUsed = tiket.status === "TERPAKAI";
+  const isValid = tiket.status === "VALID";
+  const isPending = tiket.status === "PENDING";
+  const isCancelled = tiket.status === "DIBATALKAN";
+
   const formatPaymentMethod = (method: string | null) => {
-    if (!method) return "Belum Tercatat";
-    // Bersihkan format (contoh: "bca_va" -> "BCA VA", "gopay" -> "GoPay")
+    if (!method) return "QRIS / Online";
     return method.replace(/_/g, " ").toUpperCase();
+  };
+
+  const getStatusTiketLabel = () => {
+    if (isUsed) return "Sudah Digunakan";
+    if (isValid) return "Valid (Siap Scan)";
+    if (isPending) return "Menunggu Pembayaran";
+    if (isCancelled) return "Dibatalkan";
+    return "Tidak Berlaku";
   };
 
   return (
@@ -58,84 +71,85 @@ export function TicketDetailsModal({ tiket }: TicketDetailsModalProps) {
             <div className="flex-1 p-4 pb-8 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               <div className="mx-auto space-y-6">
 
-              {/* Status Header */}
+              {/* Status Header Banner */}
               <div
-                className="flex flex-col items-center justify-center text-center border-b relative overflow-hidden aspect-[2/1]"
+                className="flex flex-col items-center justify-center text-center border-b relative overflow-hidden aspect-[2.5/1] rounded-none bg-muted"
                 style={{
-                  backgroundImage: `url('${tiket.event?.url_gambar || "/tech-banner.jpg"}')`,
+                  backgroundImage: item?.url_gambar ? `url('${item.url_gambar}')` : undefined,
                   backgroundSize: "cover",
                   backgroundPosition: "center"
                 }}
               >
+                <div className="absolute inset-0 bg-black/50" />
                 <div className="relative z-10 w-full p-4">
-                  <h3 className="text-lg font-bold tracking-widest mb-1 text-white drop-shadow-md">{tiket.event?.judul}</h3>
+                  <h3 className="text-base font-bold tracking-widest mb-1 text-white drop-shadow-md">{item?.judul || "Tiket Acara"}</h3>
                 </div>
               </div>
 
               {/* Rincian Pemesanan */}
               <div className="space-y-4">
-                <h4 className="text-[10px] font-bold tracking-widest text-muted-foreground">Info Pesanan</h4>
-                <div className="flex flex-col gap-4 text-xs">
-                  <div>
-                    <div className="text-[10px] text-muted-foreground tracking-widest">ID Pemesanan</div>
-                    <div className="font-bold tracking-wider mt-1">{tiket.id_pembayaran || tiket.id.split('-')[0]}</div>
+                <h4 className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Info Pesanan</h4>
+                <div className="flex flex-col gap-3 text-xs">
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-[10px] text-muted-foreground tracking-widest">ID Pemesanan</span>
+                    <span className="font-bold tracking-wider">{tiket.id_pembayaran || tiket.id.split('-')[0]}</span>
                   </div>
 
-                  <div>
-                    <div className="text-[10px] text-muted-foreground tracking-widest">Waktu Transaksi</div>
-                    <div className="font-medium mt-1">{formatDate(tiket.dibuat_pada)} • {formatTime(tiket.dibuat_pada)}</div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-[10px] text-muted-foreground tracking-widest">Waktu Transaksi</span>
+                    <span className="font-medium">{formatDate(tiket.dibuat_pada)} • {formatTime(tiket.dibuat_pada)}</span>
                   </div>
 
-                  <div>
-                    <div className="text-[10px] text-muted-foreground tracking-widest">Metode Pembayaran</div>
-                    <div className="font-bold mt-1 tracking-widest">{formatPaymentMethod(tiket.metode_pembayaran)}</div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-[10px] text-muted-foreground tracking-widest">Metode Pembayaran</span>
+                    <span className="font-bold tracking-widest">{formatPaymentMethod(tiket.metode_pembayaran)}</span>
                   </div>
 
-                  <div>
-                    <div className="text-[10px] text-muted-foreground tracking-widest">Total Pembayaran</div>
-                    <div className="font-bold mt-1 tracking-widest">IDR {tiket.event?.harga?.toLocaleString("id-ID") || 0}</div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-[10px] text-muted-foreground tracking-widest">Total Pembayaran</span>
+                    <span className="font-bold tracking-widest text-primary">IDR {Number(item?.harga || 0).toLocaleString("id-ID")}</span>
                   </div>
 
-                  <div>
-                    <div className="text-[10px] text-muted-foreground tracking-widest">Status Pembayaran</div>
-                    <div className={`font-bold mt-1 tracking-widest ${tiket.status === "DIBATALKAN" ? "text-red-600" : "text-green-600"}`}>
-                      {tiket.status === "DIBATALKAN" ? "Pesanan Dibatalkan" : "Pembayaran Berhasil"}
-                    </div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-[10px] text-muted-foreground tracking-widest">Status Pembayaran</span>
+                    <span className={`font-bold tracking-widest ${isCancelled ? "text-red-600" : isPending ? "text-yellow-600" : "text-green-600"}`}>
+                      {isCancelled ? "Pesanan Dibatalkan" : isPending ? "Belum Bayar" : "Pembayaran Berhasil"}
+                    </span>
                   </div>
 
-                  <div>
-                    <div className="text-[10px] text-muted-foreground tracking-widest">Status Tiket</div>
-                    <div className="font-bold mt-1 tracking-widest">
-                      {tiket.status === "VALID" ? "Belum Digunakan" :
-                        tiket.status === "DIGUNAKAN" ? "Sudah Digunakan" :
-                          "Tidak Berlaku"}
-                    </div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-[10px] text-muted-foreground tracking-widest">Status Tiket</span>
+                    <span className={`font-bold tracking-widest ${isUsed ? "text-blue-600" : isValid ? "text-green-600" : isPending ? "text-yellow-600" : "text-red-600"}`}>
+                      {getStatusTiketLabel()}
+                    </span>
                   </div>
                 </div>
               </div>
 
               {/* Rincian Acara */}
               <div className="space-y-4 pt-4 border-t border-dashed">
-                <h4 className="text-[10px] font-bold tracking-widest text-muted-foreground">Detail Acara</h4>
-                <div className="flex flex-col gap-4 text-xs">
-                  <div>
-                    <div className="text-[10px] text-muted-foreground tracking-widest">Tanggal Acara</div>
-                    <div className="font-medium mt-1">{tiket.event?.tanggal_mulai ? formatDate(tiket.event.tanggal_mulai) : ""}</div>
+                <h4 className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">Detail Acara</h4>
+                <div className="flex flex-col gap-3 text-xs">
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-[10px] text-muted-foreground tracking-widest">Tanggal Acara</span>
+                    <span className="font-medium">{item?.tanggal_mulai ? formatDate(item.tanggal_mulai) : "-"}</span>
                   </div>
 
-                  <div>
-                    <div className="text-[10px] text-muted-foreground tracking-widest">Berakhir Pada</div>
-                    <div className="font-medium mt-1">{tiket.event?.tanggal_selesai ? formatDate(tiket.event.tanggal_selesai) : ""}</div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-[10px] text-muted-foreground tracking-widest">Berakhir Pada</span>
+                    <span className="font-medium">{item?.tanggal_selesai ? formatDate(item.tanggal_selesai) : "-"}</span>
                   </div>
 
-                  <div>
-                    <div className="text-[10px] text-muted-foreground tracking-widest">Waktu</div>
-                    <div className="font-medium mt-1">{tiket.event?.tanggal_mulai ? formatTime(tiket.event.tanggal_mulai) : ""} - {tiket.event?.tanggal_selesai ? formatTime(tiket.event.tanggal_selesai) : ""} WIB</div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-[10px] text-muted-foreground tracking-widest">Waktu</span>
+                    <span className="font-medium">
+                      {item?.waktu || (item?.tanggal_mulai ? `${formatTime(item.tanggal_mulai)} ${item?.tanggal_selesai ? `- ${formatTime(item.tanggal_selesai)}` : ""} WIB` : "-")}
+                    </span>
                   </div>
 
-                  <div>
-                    <div className="text-[10px] text-muted-foreground tracking-widest">Lokasi</div>
-                    <div className="font-medium mt-1 leading-relaxed">{tiket.event?.lokasi}</div>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-[10px] text-muted-foreground tracking-widest">Lokasi</span>
+                    <span className="font-medium text-right max-w-[200px]">{item?.lokasi || "-"}</span>
                   </div>
                 </div>
               </div>

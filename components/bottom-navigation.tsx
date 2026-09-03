@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Compass, QrCode, History, User, Menu, LayoutDashboard, CalendarDays, Images, CompassIcon, ScanLine, Users, ShieldCheck } from "lucide-react";
+import { Home, Compass, QrCode, History, User, Menu, LayoutDashboard, CalendarDays, Images, CompassIcon, ScanLine, Users, ShieldCheck, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth/client";
 
@@ -21,7 +21,7 @@ export function BottomNavigation() {
         .then((data) => {
           if (data.peran) setUserRole(data.peran);
         })
-        .catch(() => {});
+        .catch(() => { });
     } else {
       setUserRole(null);
     }
@@ -40,12 +40,14 @@ export function BottomNavigation() {
     { name: "Akun", href: "/akun", icon: User },
   ] : [
     { name: "Beranda", href: "/", icon: Home },
-    { name: "Acara", href: "/acara", icon: Compass },
-    { name: "QR Tiket", href: "/e-tiket", icon: QrCode, isFloating: true },
+    { name: "Acara", href: "/acara", icon: CalendarDays },
+    { name: "Barcode", href: "/barcode", icon: QrCode, isFloating: true },
     { name: "Event", href: "/event", icon: Compass },
+    { name: "Akun", href: "/akun", icon: User },
   ];
 
-  const allMoreLinks = [
+  // Panel "Lainnya" hanya untuk staf/admin
+  const allMoreLinks = isStaffOrAdmin ? [
     { name: "Akun", href: "/akun", icon: User },
     { name: "Scan Barcode", href: "/staf/scan", icon: ScanLine },
     { name: "Riwayat", href: "/staf/riwayat-scan", icon: History },
@@ -54,10 +56,11 @@ export function BottomNavigation() {
     { name: "Banner", href: "/admin/banner", icon: Images },
     { name: "Pengguna", href: "/admin/pengguna", icon: Users },
     { name: "Staf", href: "/admin/staf", icon: ShieldCheck },
-  ];
+  ] : [];
 
   const mainHrefs = mainLinks.map((item) => item.href);
   const moreLinks = allMoreLinks.filter((item) => !mainHrefs.includes(item.href));
+  const showMoreButton = isStaffOrAdmin;
 
   return (
     <>
@@ -72,7 +75,7 @@ export function BottomNavigation() {
 
         {/* Main bottom bar */}
         <div className="container mx-auto px-1 max-w-md relative z-20 bg-background border-t shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.15)] rounded-t-2xl">
-          <div className="grid grid-cols-5 py-2 relative z-10 bg-background rounded-t-2xl">
+          <div className={cn("grid py-2 relative z-10 bg-background rounded-t-2xl", showMoreButton ? "grid-cols-5" : "grid-cols-5")}>
             {mainLinks.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
@@ -121,28 +124,30 @@ export function BottomNavigation() {
               );
             })}
 
-            {/* Tombol trigger Lainnya */}
-            <button
-              onClick={() => setShowMore(!showMore)}
-              className={cn(
-                "flex flex-col items-center justify-center w-full mx-auto py-1 transition-all duration-200 rounded-none",
-                showMore
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <Menu className="w-5 h-5 mb-1" />
-              <span
+            {/* Tombol trigger Lainnya — hanya untuk staf/admin */}
+            {showMoreButton && (
+              <button
+                onClick={() => setShowMore(!showMore)}
                 className={cn(
-                  "text-[9px] font-bold tracking-widest text-center leading-tight",
+                  "flex flex-col items-center justify-center w-full mx-auto py-1 transition-all duration-200 rounded-none",
                   showMore
                     ? "text-primary"
-                    : "text-muted-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                Lainnya
-              </span>
-            </button>
+                <Menu className="w-5 h-5 mb-1" />
+                <span
+                  className={cn(
+                    "text-[9px] font-bold tracking-widest text-center leading-tight",
+                    showMore
+                      ? "text-primary"
+                      : "text-muted-foreground"
+                  )}
+                >
+                  Lainnya
+                </span>
+              </button>
+            )}
           </div>
         </div>
 

@@ -24,7 +24,7 @@ export default async function Tiketku() {
     select: { id: true }
   });
 
-  const tiketList = pengguna ? await prisma.tiket.findMany({
+  const rawTiketList = pengguna ? await prisma.tiket.findMany({
     where: {
       id_pengguna: pengguna.id
     },
@@ -36,6 +36,8 @@ export default async function Tiketku() {
       dibuat_pada: "desc"
     }
   }) : [];
+
+  const tiketList = JSON.parse(JSON.stringify(rawTiketList));
 
   return (
     <div className="flex flex-col min-h-screen text-xs">
@@ -52,24 +54,27 @@ export default async function Tiketku() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6">
-              {tiketList.map((tiket) => {
-                const isPaid = tiket.status === "VALID" || tiket.status === "TERPAKAI";
+              {tiketList.map((tiket: any) => {
+                const isUsed = tiket.status === "TERPAKAI";
+                const isValid = tiket.status === "VALID";
                 const isPending = tiket.status === "PENDING";
 
                 // Ambil data acara atau event (mana yang ada)
                 const item = tiket.acara || tiket.event;
 
                 return (
-                  <div key={tiket.id} className={`border bg-background transition-colors ${isPaid ? "border-primary/50" : "border-border"}`}>
+                  <div key={tiket.id} className={`border bg-background transition-colors ${isUsed ? "border-blue-500/40 bg-blue-50/10" : isValid ? "border-primary/50" : "border-border"}`}>
                     <div className="p-4 flex flex-col gap-4">
                       {/* Ticket Header (Status) */}
                       <div className="flex justify-between items-center border-b pb-3">
                         <span className="text-[10px] text-muted-foreground  tracking-widest">ID: {tiket.id.split('-')[0]}</span>
-                        <div className={`px-2 py-1 text-[9px] font-bold  tracking-widest border ${isPaid ? "bg-primary/10 text-primary border-primary/20" :
+                        <div className={`px-2 py-1 text-[9px] font-bold  tracking-widest border ${
+                          isUsed ? "bg-blue-600 text-white border-blue-700" :
+                          isValid ? "bg-primary/10 text-primary border-primary/20" :
                           isPending ? "bg-yellow-500/10 text-yellow-600 border-yellow-500/20" :
-                            "bg-red-500/10 text-red-600 border-red-500/20"
-                          }`}>
-                          {isPaid ? "Sudah Bayar" : isPending ? "Belum Bayar" : "Dibatalkan"}
+                          "bg-red-500/10 text-red-600 border-red-500/20"
+                        }`}>
+                          {isUsed ? "TIKET SUDAH DIGUNAKAN" : isValid ? "SUDAH BAYAR" : isPending ? "BELUM BAYAR" : "DIBATALKAN"}
                         </div>
                       </div>
 
@@ -87,7 +92,9 @@ export default async function Tiketku() {
                           </div>
                           <div className="flex justify-between">
                             <span>Kode QR</span>
-                            <span className="text-foreground font-medium">{isPaid ? "Tersedia" : "Menunggu pembayaran"}</span>
+                            <span className={`font-medium ${isUsed ? "text-blue-600 font-bold" : isValid ? "text-green-600 font-bold" : "text-foreground"}`}>
+                              {isUsed ? "Sudah Terpakai (Scan Berhasil)" : isValid ? "Tersedia (Siap Scan)" : "Menunggu pembayaran"}
+                            </span>
                           </div>
                         </div>
                       </div>
