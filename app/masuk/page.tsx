@@ -3,11 +3,11 @@ import { LoginForm } from "@/components/login-form";
 
 export default function MasukPage() {
   return (
-    <div className="flex flex-col min-h-screen text-xs bg-muted/10">
+    <div className="fixed inset-0 flex flex-col bg-muted/10 text-xs overflow-hidden pb-6">
       {/* Consistent Header */}
-      <TopBar />
+      <TopBar title="Tiketku.com" />
 
-      <div className="flex-1 flex flex-col justify-center max-w-6xl mx-auto w-full p-4 md:p-6">
+      <div className="flex-1 flex flex-col justify-center items-center max-w-6xl mx-auto w-full p-4 md:p-6 overflow-hidden my-auto">
         <LoginForm mode="login" />
       </div>
     </div>

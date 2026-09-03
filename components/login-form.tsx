@@ -29,29 +29,29 @@ export function LoginForm({
   };
 
   return (
-    <div className={cn("flex flex-col gap-6 w-full max-w-5xl mx-auto", className)} {...props}>
-      <Card className="overflow-hidden p-0 w-full min-h-[500px] md:min-h-[600px] shadow-lg border-0 md:border flex flex-col">
+    <div className={cn("flex flex-col gap-4 w-full max-w-5xl mx-auto my-auto", className)} {...props}>
+      <Card className="overflow-hidden p-0 w-full min-h-[360px] md:min-h-[500px] shadow-lg border-0 md:border flex flex-col">
         <CardContent className="grid p-0 md:grid-cols-2 flex-1">
           <div className="p-6 md:p-12 flex flex-col justify-center">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center mb-6">
-                <img 
-                  src="/logo-login.svg" 
-                  alt="Logo Login" 
-                  className="w-20 h-20 mb-4 md:hidden object-contain" 
+                <img
+                  src="/logo-login.svg"
+                  alt="Logo Login"
+                  className="w-20 h-20 mb-4 md:hidden object-contain"
                 />
                 <h1 className="text-2xl font-bold tracking-tight">
                   {isDaftar ? 'Daftar Akun' : 'Selamat Datang'}
                 </h1>
                 <p className="text-balance text-muted-foreground text-sm">
-                  {isDaftar 
-                    ? 'Daftar sekarang untuk mendapatkan promo diskon khusus pengguna baru.' 
+                  {isDaftar
+                    ? 'Daftar sekarang untuk mendapatkan promo diskon khusus pengguna baru.'
                     : 'Masuk ke akun Anda saat ini untuk mendapatkan promo diskon khusus pengguna baru.'}
                 </p>
               </div>
-              <Button 
-                variant="outline" 
-                type="button" 
+              <Button
+                variant="outline"
+                type="button"
                 onClick={handleGoogleLogin}
                 className="w-full h-12 text-sm tracking-wide mt-4"
               >
@@ -76,7 +76,7 @@ export function LoginForm({
                 </svg>
                 Lanjutkan dengan Google
               </Button>
-              <FieldDescription className="text-center mt-6">
+              <FieldDescription className="text-center text-xs mt-6">
                 {isDaftar ? (
                   <>Sudah punya akun? <Link href="/masuk" className="text-primary hover:underline">Masuk sekarang</Link></>
                 ) : (
@@ -95,8 +95,8 @@ export function LoginForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center text-[10px]">
-        Dengan melanjutkan, Anda menyetujui <a href="#" className="hover:underline">Syarat Layanan</a>{" "}
-        dan <a href="#" className="hover:underline">Kebijakan Privasi</a> kami.
+        Dengan melanjutkan, Anda menyetujui <br /><a href="#" className="hover:underline">Syarat Layanan</a>{" "}
+        dan <a href="#" className="hover:underline">Kebijakan Privasi</a>
       </FieldDescription>
     </div>
   )
